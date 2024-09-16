@@ -2,4 +2,38 @@
 
 \section{Requisitos Funcionais}
 
+\subsection{RF1: Iniciar programa}\label{subsection:RF1}
+Ao iniciar, o programa deve mostrar a interface do \hyperref[fig:configuracao tabuleiro]{tabuleiro em sua configuração
+inicial}, e solicitar que o usuário informe o seu nome, que será usado para identificar o jogador. Após o usuário 
+informar seu nome e solicitar \rfreference{RF2}{Iniciar jogo}, o programa deverá requisitar uma conexão com o servidor;
+\begin{itemize}
+  \item Caso a conexão seja bem sucedida, apresentar uma mensagem de sucesso ao usuário e liberar demais funcionalidades do jogo;
+  \item Caso contrário, informar o erro ao usuário e apresentar as opções:
+    \begin{itemize}
+        \item Tentar novamente;
+        \item Fechar o programa;
+    \end{itemize}
+\end{itemize}
+
+\subsection{RF2: Iniciar jogo}\label{subsection:RF2}
+Na interface inicial apresentada ao \rfreference{RF1}{Iniciar programa}, está inclusa a ação ``\textbf{Iniciar jogo}"",
+liberada após o jogador informar seu nome. Para iniciar a partida, o programa enviará uma requisição ao servidor, que
+caso bem-sucedida, mostrará qual jogador realizará a primeira jogada, assim como suas respectivas identificações.
+\subparagraph{} A interface deverá ser atualizada com as informações recebidas; caso o jogador local seja quem inicia a
+partida, a interface deve estar habilitada para seu procedimento de lance \rfreference{RF4}{Selecionar peça}. Esta
+funcionalidade só deve estar habilitada se o programa estiver em seu estado inicial, isto é, sem partida em andamento e
+com o tabuleiro em seu estado inicial. 
+
+  \subsection{RF3: Restaurar estado inicial} \lipsum[1] %o programa deve apresentar a opção de menu “restaurar estado inicial” para levar o programa ao seu seu estado inicial, isto é, sem partida em andamento e com o tabuleiro em seu estado inicial. Esta funcionalidade só deve estar habilitada se o programa estiver com uma partida finalizada; 
+  \subsection{RF4: Selecionar peça}\label{subsection:RF4}\lipsum[1] %O programa deve permitir a um jogador habilitado selecionar uma peça presente no tabuleiro que tenha movimentos possíveis (ver apêndice) e seja sua, caso existam peças no cemitério estas deverão ser obrigatoriamente jogadas. Se não houver a possibilidade de mover nenhuma peça ou a peça do cemitério não tem movimentos válidos, o programa passa a ver do jogador. As peças passíveis de seleção devem ser destacadas na interface. A peça selecionada deve ser também visualmente destacada da interface do programa, e após a seleção a interface deve destacar visualmente quais locais são possíveis de movimentar a peça. Se a ação for executada após o jogador já ter uma peça selecionada ou ter selecionado origem (neste caso, ver Requisito funcional 5), deve ser notificado lance irregular e o programa deve novamente aguardar a primeira ação do jogador habilitado (selecionar peça ou selecionar origem); 
+  \subsection{RF5: Selecionar destino} \lipsum[1] %O programa deve permitir a um jogador habilitado selecionar uma posição do tabuleiro, onde será colocada a peça previamente selecionada (de sua área de peças ou de uma posição do tabuleiro). Esta funcionalidade só deve estar habilitada se o programa estiver com peça selecionada (ver Requisito funcional 4) e existam jogadas válidas para esta peça (ver apêndice). Caso a peça seja colocada em um local no qual exista somente uma peça do adversário (local válido), o programa deve remover a peça do adversário daquela posição e colocá-la no cemitério (ver apêndice), a peça somente pode andar no sentido anti-horário em relação ao jogador (ver apêndice). No caso de êxito na colocação de peça em seu destino, o programa deve enviar a jogada ao adversário (utilizando os recursos de DOG, ver Requisito funcional 8) e avaliar o encerramento de partida. A jogada enviada deve conter a posição de origem do tabuleiro (no caso de seleção de origem), a posição destino e se caso houve pontuação ou uma peça foi para o cemitério. Se todas as peças já estiverem no quadrante do jogador (ver apêndice), o jogador pode, se o dado permitir, mover as peças para fora do tabuleiro. No caso de encerramento de partida, deve ser notificado o nome do jogador vencedor, e aparecer uma janela com a pontuação do ganhador; no caso de não encerramento, deve ser desabilitado o jogador local e o programa fica no aguardo de jogada do adversário (ver Requisito funcional 8) ou de notificação de abandono (ver Requisito funcional 9); 
+  \subsection{RF6: Receber determinação de início} \lipsum[1] %o programa deve poder receber uma notificação de início de partida, originada em Dog Server, em função de solicitação de início de partida por parte de outro jogador conectado ao servidor. O procedimento a partir do recebimento da notificação de início é o mesmo descrito no ‘Requisito funcional 2 – Iniciar jogo’, isto é, a interface do programa deve ser atualizada com as informações recebidas e caso o jogador local seja quem inicia a partida, a interface deve estar habilitada para seu procedimento de lance. 
+  \subsection{RF7: Receber jogada} \lipsum[1] %o programa deve poder receber uma jogada do adversário, enviada por Dog Server, quando for a vez do adversário do jogador local. A jogada recebida deve ser um lance regular e conter as informações especificadas para o envio de jogada no ‘Requisito funcional 6 – Selecionar destino’. O programa deve remover a peça de origem definida e colocá-la no destino. Deve-se avaliar se alguma peça do jogador foi colocada no cemitério e se houve pontuação ao chegar ao fim do tabuleiro (checar apêndice). Após isso, deve-se avaliar o encerramento de partida. No caso de encerramento de partida, deve ser notificado o nome do jogador vencedor; no caso de não encerramento, deve ser habilitado o jogador local, para que possa proceder a seu lance; 
+  \subsection{RF8: Receber notificação de abandono} \lipsum[1] %o programa deve poder receber uma notificação de abandono de partida por parte do adversário remoto, enviada por Dog Server. Neste caso, a partida deve ser considerada encerrada e o abandono notificado na interface.
+
 \section{Requisitos Não-Funcionais}
+
+  \subsection{RNF1: Tecnologia de interface gráfica para usuário} \lipsum[1] % A interface gráfica deve ser baseada em TKinter; 
+  \subsection{RNF2: Suporte para a especificação de projeto} \lipsum[1] % a especificação de projeto deve ser produzida com a ferramenta Visual Paradigm; 
+  \subsection{RNF3: Interface do programa} \lipsum[1] % A interface do programa será produzida conforme o esboço da imagem abaixo.
+

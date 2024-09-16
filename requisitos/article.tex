@@ -1,7 +1,10 @@
 \documentclass{scrreprt}
 \usepackage{listings}
+\usepackage{lipsum}
 \usepackage{underscore}
 \usepackage{graphicx}
+\usepackage[ddmmyyyy]{datetime}
+\usepackage{tabularx}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{stix}
 \usepackage[bookmarks=true]{hyperref}
@@ -17,13 +20,13 @@
 \newcommand{\sbt}{$\blacktriangle$}
 \newcommand{\sbs}{$\mdblksquare$}
 \newcommand{\sbc}{$\mdblkcircle$}
-
 \newcommand{\bwt}{$\bigtriangleup$}
 \newcommand{\bws}{$\lgwhtsquare$}
 \newcommand{\bwc}{$\lgwhtcircle$}
 \newcommand{\swt}{$\triangle$}
 \newcommand{\sws}{$\mdwhtsquare$}
 \newcommand{\swc}{$\mdwhtcircle$}
+\newcommand{\rfreference}[2]{\lbrack\hyperref[subsection:#1]{#1}\rbrack\space\textbf{#2}}
 
 \newglossaryentry{alapo} {
   name=Alapo,
