@@ -19,7 +19,6 @@
 *.lot
 *.nav
 *.out
-*.pdf
 *.run.xml
 *.snm
 *.toc
