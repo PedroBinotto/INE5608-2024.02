@@ -5,7 +5,7 @@ Desenvolvimento de um programa distribuído que possibilite a realização de di
 ``\gls{alapo}''\cite{alapoWebsite} na modalidade
 \textit{usuário vs.\ usuário}.
 
-\section{Regras do jogo}
+\section{Regras do jogo}\label{section:regras}
 O jogo deve ser jogado em um tabuleiro quadrado de 36 ($6 \times 6$) posições; cada jogador deve iniciar uma partida com
 12 peças para si, para um total de 24 peças no tabuleiro no momento que a partida é iniciada.\\
 As peças do jogo são de seis (6) tipos diferentes, e cada jogador deve receber duas peças de cada tipo, sendo que as
@@ -42,6 +42,8 @@ cada jogador:
     (análogo à forma que essa mecânica se apresenta no \textit{xadrez} ou na \textit{dama});
 \end{itemize}
 
+\newpage
+
 \subsection{Configuração inicial do tabuleiro}
 Para começar uma partida as peças devem ser posicionadas, em extremidades do tabuleiro, por cada jogador, na seguinte
 disposição:
@@ -67,7 +69,7 @@ De maneira que o tabuleiro apresente a seguinte configuração, assim que todas 
     \label{fig:configuracao tabuleiro}
 \end{figure}
 
-\subsection{Progressão da partida}
+\subsection{Progressão da partida}\label{section:progressao}
 Assim que as peças estiverem posicionadas, um dos jogadores (qual jogador iniciará a primeira jogada pode ser escolhido
 aleatoriamente) escolhe uma das suas peças e faz o primeiro movimento. Os jogadores tomam turnos realizando lances
 (movimentos) e capturando as peças um do outro, com o objetivo alcançar a extremidade oposta do tabuleiro com uma de suas

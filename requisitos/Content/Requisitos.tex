@@ -24,16 +24,102 @@ partida, a interface deve estar habilitada para seu procedimento de lance \rfref
 funcionalidade só deve estar habilitada se o programa estiver em seu estado inicial, isto é, sem partida em andamento e
 com o tabuleiro em seu estado inicial. 
 
-  \subsection{RF3: Restaurar estado inicial} \lipsum[1] %o programa deve apresentar a opção de menu “restaurar estado inicial” para levar o programa ao seu seu estado inicial, isto é, sem partida em andamento e com o tabuleiro em seu estado inicial. Esta funcionalidade só deve estar habilitada se o programa estiver com uma partida finalizada; 
-  \subsection{RF4: Selecionar peça}\label{subsection:RF4}\lipsum[1] %O programa deve permitir a um jogador habilitado selecionar uma peça presente no tabuleiro que tenha movimentos possíveis (ver apêndice) e seja sua, caso existam peças no cemitério estas deverão ser obrigatoriamente jogadas. Se não houver a possibilidade de mover nenhuma peça ou a peça do cemitério não tem movimentos válidos, o programa passa a ver do jogador. As peças passíveis de seleção devem ser destacadas na interface. A peça selecionada deve ser também visualmente destacada da interface do programa, e após a seleção a interface deve destacar visualmente quais locais são possíveis de movimentar a peça. Se a ação for executada após o jogador já ter uma peça selecionada ou ter selecionado origem (neste caso, ver Requisito funcional 5), deve ser notificado lance irregular e o programa deve novamente aguardar a primeira ação do jogador habilitado (selecionar peça ou selecionar origem); 
-  \subsection{RF5: Selecionar destino} \lipsum[1] %O programa deve permitir a um jogador habilitado selecionar uma posição do tabuleiro, onde será colocada a peça previamente selecionada (de sua área de peças ou de uma posição do tabuleiro). Esta funcionalidade só deve estar habilitada se o programa estiver com peça selecionada (ver Requisito funcional 4) e existam jogadas válidas para esta peça (ver apêndice). Caso a peça seja colocada em um local no qual exista somente uma peça do adversário (local válido), o programa deve remover a peça do adversário daquela posição e colocá-la no cemitério (ver apêndice), a peça somente pode andar no sentido anti-horário em relação ao jogador (ver apêndice). No caso de êxito na colocação de peça em seu destino, o programa deve enviar a jogada ao adversário (utilizando os recursos de DOG, ver Requisito funcional 8) e avaliar o encerramento de partida. A jogada enviada deve conter a posição de origem do tabuleiro (no caso de seleção de origem), a posição destino e se caso houve pontuação ou uma peça foi para o cemitério. Se todas as peças já estiverem no quadrante do jogador (ver apêndice), o jogador pode, se o dado permitir, mover as peças para fora do tabuleiro. No caso de encerramento de partida, deve ser notificado o nome do jogador vencedor, e aparecer uma janela com a pontuação do ganhador; no caso de não encerramento, deve ser desabilitado o jogador local e o programa fica no aguardo de jogada do adversário (ver Requisito funcional 8) ou de notificação de abandono (ver Requisito funcional 9); 
-  \subsection{RF6: Receber determinação de início} \lipsum[1] %o programa deve poder receber uma notificação de início de partida, originada em Dog Server, em função de solicitação de início de partida por parte de outro jogador conectado ao servidor. O procedimento a partir do recebimento da notificação de início é o mesmo descrito no ‘Requisito funcional 2 – Iniciar jogo’, isto é, a interface do programa deve ser atualizada com as informações recebidas e caso o jogador local seja quem inicia a partida, a interface deve estar habilitada para seu procedimento de lance. 
-  \subsection{RF7: Receber jogada} \lipsum[1] %o programa deve poder receber uma jogada do adversário, enviada por Dog Server, quando for a vez do adversário do jogador local. A jogada recebida deve ser um lance regular e conter as informações especificadas para o envio de jogada no ‘Requisito funcional 6 – Selecionar destino’. O programa deve remover a peça de origem definida e colocá-la no destino. Deve-se avaliar se alguma peça do jogador foi colocada no cemitério e se houve pontuação ao chegar ao fim do tabuleiro (checar apêndice). Após isso, deve-se avaliar o encerramento de partida. No caso de encerramento de partida, deve ser notificado o nome do jogador vencedor; no caso de não encerramento, deve ser habilitado o jogador local, para que possa proceder a seu lance; 
-  \subsection{RF8: Receber notificação de abandono} \lipsum[1] %o programa deve poder receber uma notificação de abandono de partida por parte do adversário remoto, enviada por Dog Server. Neste caso, a partida deve ser considerada encerrada e o abandono notificado na interface.
+\subsection{RF3: Restaurar estado inicial}\label{subsection:RF3}
+O programa deve apresentar a opção de menu ``\textbf{Restaurar estado inicial}'' para reverter o programa à sua
+configuração inicial, isto é, sem partida em andamento e com o \hyperref[fig:configuracao tabuleiro]{tabuleiro em seu
+estado inicial}. Esta funcionalidade só deve estar habilitada se o programa estiver com uma partida finalizada.
+
+\subsection{RF4: Selecionar peça}\label{subsection:RF4}
+O programa deve permitir a um jogador, quando está em seu turno, selecionar uma de suas peças no tabuleiro para jogar.
+\begin{itemize}
+  \item Caso o oponente tenha realizado um lance que configura uma \textit{vitória} no final do tabuleiro, e esta for
+    \textit{contestável} (ver \hyperref[section:regras]{Regras do jogo}), então o jogador deve, obrigatoriamente,
+    selecionar uma das peças que contestará a vitória do oponente;
+  \item Caso contrário, o jogador pode selecionar qualquer uma de suas peças que possam realizar movimentos
+    imediatamente;
+\end{itemize}
+As peças passíveis de seleção devem ser destacadas na interface. A peça selecionada deve, também, visualmente destacada
+da interface do programa, e após a seleção a interface deve destacar visualmente as posições para qual a peça pode ser
+movida; caso uma ou mais posições alcançáveis configure uma \textit{captura} de uma peça do oponente, esta posição
+deve distinguir-se visualmente das demais alternativas, sinalizando que representa uma \textit{captura}, e não apenas um
+movimento.
+
+\subsection{RF5: Selecionar destino} \label{subsection:RF5}
+O programa deve permitirá que um jogador, após realizar \rfreference{RF4}{Selecionar peça}, selecione a posição de
+destino desta mesma peça, de acordo com o tipo de movimentos dessa peça, da configuração atual do tabuleiro, e do atual
+estado da partida (ver \hyperref[section:regras]{Regras do jogo});
+\begin{itemize}
+  \item Caso exista uma peça do oponente em uma \hyperref[section:progressao]{posição que exige ser contestada}, esta
+    posição deverá ser a única passível de seleção, e deverá ser visualmente realçada para sinalizar que pode ser
+    selecionada;
+  \item Caso contrário, todas as possíveis posições alcançáveis pela peça em sua posição atual devem ser destacadas e
+    habilitadas para seleção;
+\end{itemize}
+Ao realizar a seleção de uma posição válida para completar o movimento, a instância do programa deve enviar ao servidor
+uma mensagem contendo informações sobre a jogada:
+
+\begin{description}
+  \item[Peça selecionada:] Um identificador que especifique qual peça está sendo movimentada no lance;
+  \item[Posição de origem:] Posição de origem do movimento;
+  \item[Posição de destino:] Posição de destino do movimento;
+  \item[Estado da partida:] Estado da partida, determinado pela última jogada; pode ser um valor entre:
+    \begin{description}
+      \item[EM ANDAMENTO:] Quando o movimento realizada não categoriza, imediatamente, uma vitória para o jogador que
+        realizou a jogada;
+      \item[FINALIZADA:] Quando o movimento categoriza, precisamente, uma \textit{vitória} para o jogador que realiza a
+        jogada (ver \hyperref[section:progressao]{Progressão da partida});
+    \end{description}
+\end{description}
+Caso um movimente categorize uma \textit{vitória} e finalize a partida, apresentar ao usuário a opção de
+\rfreference{RF3}{Restaurar estado inicial}.
+
+\subsection{RF6: Receber determinação de início} \label{subsection:RF6} 
+O programa deve receber e processar uma notificação de início de partida, originada no servidor, em função de 
+solicitação de início de partida por parte de outro jogador conectado ao servidor. O procedimento a partir do 
+recebimento da notificação de início é o mesmo descrito no \rfreference{RF2}{Iniciar jogo}, isto é, a interface do 
+programa deve ser atualizada com as informações recebidas. Caso o jogador local seja quem inicia a partida, a interface 
+deve estar habilitada para seu procedimento de lance, especificado em \rfreference{RF4}{Selecionar peça} e
+\rfreference{RF5}{Selecionar destino}.
+
+\subsection{RF7: Receber jogada} \label{subsection:RF7} 
+O programa deve poder receber e processar uma jogada do adversário, enviada pelo servidor, quando for o turno do oponente
+jogar. A jogada recebida deve ser um lance regular e conter as informações especificadas para o envio de jogada no 
+\rfreference{RF5}{Selecionar destino}. O programa deve remover a peça de origem definida e colocá-la no destino, e 
+atender os critérios a seguir:
+
+\begin{itemize}
+  \item O programa deve processar uma \textit{captura}, quando este for o cenário caracterizado pela jogada recebida, 
+    removendo a peça capturada do tabuleiro;
+  \item O programa deve processar uma \textit{vitória} do oponente, quandoo este for o cenário caracterizado pela jogada
+    recebida, finalizando a partida e apresentando \rfreference{RF3}{Restaurar estado inicial}, da mesma forma como
+    acontece em \rfreference{RF5}{Selecionar destino};
+  \item O programa deve processar uma situação de \textit{contestação obrigatóra}, quando este for o cenário
+    caracterizado pela jogada recebida, obrigando o jogador local a contestar o último lance do oponente, como
+    especificado em \rfreference{RF4}{Selecionar peça} e \rfreference{RF5}{Selecionar destino};
+\end{itemize}
+Caso a jogada não caracterize nenhum dos casos especiais listados acima, o programa segue para o turno do jogador local,
+com \rfreference{RF4}{Selecionar peça}.
+
+\subsection{RF8: Receber notificação de abandono} \label{subsection:RF8} 
+O programa deverá poder receber e processar um sinal de abandono de partida por parte do oponente remoto, enviada pelo
+servidor; neste caso, a partida deve ser considerada encerrada e o abandono notificado na interface, apresentando ao 
+usuário a opção de \rfreference{RF3}{Restaurar estado inicial}.
 
 \section{Requisitos Não-Funcionais}
 
-  \subsection{RNF1: Tecnologia de interface gráfica para usuário} \lipsum[1] % A interface gráfica deve ser baseada em TKinter; 
-  \subsection{RNF2: Suporte para a especificação de projeto} \lipsum[1] % a especificação de projeto deve ser produzida com a ferramenta Visual Paradigm; 
-  \subsection{RNF3: Interface do programa} \lipsum[1] % A interface do programa será produzida conforme o esboço da imagem abaixo.
+\subsection{RNF1: Tecnologia de interface gráfica para usuário} \label{subsection:RNF1}
+A interface gráfica deve ser baseada em \gls{tkinter}.
+
+\subsection{RNF2: Suporte para a especificação de projeto} \label{subsection:RNF2}
+A especificação e documentação do projeto deve ser produzida com a ferramenta \gls{visualparadigm}.
+
+\subsection{RNF3: Interface do programa} \label{subsection:RNF3}
+A interface do programa será produzida conforme o esboço da imagem abaixo:
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=15cm]{Images/figure_2_graphical_interface}
+    \caption{\textit{Mockup} de interface gráfica do programa}
+    \label{fig:configuracao tabuleiro}
+\end{figure}
 
