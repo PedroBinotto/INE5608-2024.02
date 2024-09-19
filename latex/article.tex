@@ -1,0 +1,181 @@
+\documentclass{scrreprt}
+\usepackage{listings}
+\usepackage{lipsum}
+\usepackage{underscore}
+\usepackage{graphicx}
+\usepackage[ddmmyyyy]{datetime}
+\usepackage{tabularx}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{stix}
+\usepackage[bookmarks=true]{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[portuguese]{babel}
+\usepackage[toc]{glossaries}
+\usepackage{hyperref}
+\usepackage{fontspec}
+
+\newcommand{\bbt}{$\bigblacktriangleup$}
+\newcommand{\bbs}{$\lgblksquare$}
+\newcommand{\bbc}{$\lgblkcircle$}
+\newcommand{\sbt}{$\blacktriangle$}
+\newcommand{\sbs}{$\mdblksquare$}
+\newcommand{\sbc}{$\mdblkcircle$}
+\newcommand{\bwt}{$\bigtriangleup$}
+\newcommand{\bws}{$\lgwhtsquare$}
+\newcommand{\bwc}{$\lgwhtcircle$}
+\newcommand{\swt}{$\triangle$}
+\newcommand{\sws}{$\mdwhtsquare$}
+\newcommand{\swc}{$\mdwhtcircle$}
+\newcommand{\rfreference}[2]{\lbrack\hyperref[subsection:#1]{#1}\rbrack\space\textbf{#2}}
+
+\newglossaryentry{alapo} {
+  name=Alapo,
+  description={
+    Um jogo de estratégia semelhante ao \textit{xadrez}, projetado para dois jogadores. Desenvolvido por Johannes
+    Tranelis em 1982, na Alemanha, e publicado pela \textit{Edition Perlhuhn}, que oferece o produto até o dia de
+    hoje\cite{alapoWebsite}.
+  }
+}
+\newglossaryentry{dog} {
+  name=DOG,
+  description={
+    DOG é uma solução que possibilita o desenvolvimento de jogos como programas distribuídos a desenvolvedores de 
+    software capacitados apenas para desenvolvimento centralizado\cite{dogWebsite}.
+  }
+}
+\newglossaryentry{tkinter} {
+  name=Tkinter,
+  description={
+    Tkinter é a interface padrão da linguagem de programação Python baseada em Tcl/Tk (kit de ferramentas Tcl/Tk
+    GUI)\cite{tkinterJohnShipman}.
+  }
+}
+\newglossaryentry{visualparadigm} {
+  name=Visual Paradigm,
+  description={
+    Visual Paradigm é uma ferramenta proprietária de modelagem, prototipação e planejamento de
+    software\cite{visualparadigmtool}.
+  }
+}
+\newglossaryentry{uml} {
+  name=UML,
+  description={
+    UML, abreviação de \textit{Unified Modeling Language}, é uma linguagem de modelagem padronizada que consiste em um
+    conjunto integrado de diagramas, desenvolvida para ajudar desenvolvedores de sistemas e software a especificar,
+    visualizar, construir e documentar os artefatos de sistemas de software, bem como para modelagem de negócios e 
+    outros sistemas não-software\cite{visualParadigmUML}.
+  }
+}
+\newglossaryentry{bbt} { 
+  name=\bbt, 
+  description={
+   \textbf{Peça Triangular Grande}; pode ser referenciada de forma geral como ``\bbt'' ou ``\textbf{Peça 
+   Triangular Grande}''; ou especificamente por ``\bbt'' ou ``\bwt'' quando contexto de jogador é especificado.
+  }
+}
+\newglossaryentry{bbs} {
+  name=\bbs,
+  description={
+   \textbf{Peça Quadrada Grande}; pode ser referenciada de forma geral como ``\bbs'' ou ``\textbf{Peça 
+   Quadrada Grande}''; ou especificamente por ``\bbs'' ou ``\bws'' quando contexto de jogador é especificado.
+  }
+}
+\newglossaryentry{bbc} {
+  name=\bbc ,
+  description={
+   \textbf{Peça Circular Grande}; pode ser referenciada de forma geral como ``\bbc'' ou ``\textbf{Peça 
+   Circular Grande}''; ou especificamente por ``\bbc'' ou ``\bwc'' quando contexto de jogador é especificado.
+  }
+}
+\newglossaryentry{sbt} {
+  name=\sbt ,
+  description={ 
+   \textbf{Peça Triangular Pequena}; pode ser referenciada de forma geral como ``\sbt'' ou ``\textbf{Peça 
+   Triangular Pequena}''; ou especificamente por ``\sbt'' ou ``\swt'' quando contexto de jogador é especificado.
+  } 
+}
+\newglossaryentry{sbs} { 
+name=\sbs , 
+description={
+   \textbf{Peça Quadrada Pequena}; pode ser referenciada de forma geral como ``\sbs'' ou ``\textbf{Peça 
+   Quadrada Pequena}''; ou especificamente por ``\sbs'' ou ``\sws'' quando contexto de jogador é especificado.
+  }
+}
+\newglossaryentry{sbc} {
+  name=\sbc ,
+  description={ 
+   \textbf{Peça Circular Pequena}; pode ser referenciada de forma geral como ``\sbc'' ou ``\textbf{Peça 
+   Circular Pequena}''; ou especificamente por ``\sbc'' ou ``\swc'' quando contexto de jogador é especificado.
+  } 
+}
+
+\makeglossaries
+\selectlanguage{portuguese} 
+\newcommand\myshade{85}
+\newcommand{\pprime}{\ensuremath{^{\prime}}}
+\addto\captionsportuguese{\renewcommand*\contentsname{Sumário}}
+\setcounter{secnumdepth}{0}
+\colorlet{mylinkcolor}{violet}
+\colorlet{mycitecolor}{YellowOrange}
+\colorlet{myurlcolor}{Aquamarine}
+\hypersetup{
+    pdftitle={Especificação de Requisitos de Software},
+    pdfauthor={Pedro Santi Binotto, Gabriel Lemos da Silva, Petterson Pereira da Rosa},
+    pdfsubject={Implementação do jogo de tabuleiro``Alapo''},                        % subject of the document
+    pdfkeywords={TeX, LaTeX, graphics, images}, % list of keywords
+    linkcolor  = mylinkcolor!\myshade!black,
+    citecolor  = mycitecolor!\myshade!black,
+    urlcolor   = myurlcolor!\myshade!black,
+    colorlinks = true,
+    filecolor=black,        % color of file links
+    linktoc=page            % only page is linked
+}%
+\def\myversion{1.0}
+\date{\today}
+
+%\title{% }
+\begin{document}
+  \setmainfont{STIXTwoText}[
+    Extension={.otf},
+    UprightFont={*-Regular},
+    BoldFont={*-Bold},
+    ItalicFont={*-Italic},
+    BoldItalicFont={*-BoldItalic}
+  ]
+
+  \begin{flushright}
+      \rule{16cm}{5pt}\vskip1cm
+      \begin{bfseries}
+          \Huge{ESPECIFICAÇÃO DE REQUISITOS DE SOFTWARE}\\
+          \vspace{1.0cm}
+          para\\
+          \vspace{1.0cm}
+          JOGO DE TABULEIRO ``ALAPO''\\
+          \vspace{1.0cm}
+          \LARGE{Versão \myversion}\\
+          \vspace{1.0cm}
+          Preparado por: \\ 
+          1. Pedro Santi Binotto (20200634)\\
+          2. Gabriel Lemos da Silva (18200628)\\
+          3. Petterson Pereira da Rosa (20105097)\\
+          \vspace{1.0cm}
+          Professor: Ricardo Pereira e Silva\\
+          \vspace{1.0cm}
+          \today\\
+      \end{bfseries}
+  \end{flushright}
+
+  \tableofcontents
+
+  \clearpage
+
+  \printglossary[title=Lista de Definições, toctitle=Lista de Definições]
+
+  \include{Content/Introducao}
+  \include{Content/VisaoGeral}
+  \include{Content/Requisitos}
+
+  \addcontentsline{toc}{chapter}{Bibliografia}
+  \bibliographystyle{plain}
+  \bibliography{references}
+\end{document}
