@@ -12,7 +12,17 @@ charset-normalizer = "2.0.12"
 idna = "3.3"
 requests = "2.27.1"
 urllib3 = "1.26.9"
+autopep8 = "^2.3.1"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.autopep8]
+experimental = true
+in-place = true
+recursive = true
+verbose = true
+ignore = "E402"
+max_line_length = 120
+aggressive = 2

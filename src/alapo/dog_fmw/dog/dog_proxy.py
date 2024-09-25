@@ -4,6 +4,7 @@ from pathlib import Path
 import json
 import requests
 
+
 class DogProxy:
     def __init__(self):
         super().__init__()
@@ -13,7 +14,8 @@ class DogProxy:
         self.player_name = ""
         self.game_id = 0
         self.status = 0
-        # 0 - file game.id not found; 1 - not connected to server; 2 - connected without match; 3 - waiting move (even if it's the local player's turn)
+        # 0 - file game.id not found; 1 - not connected to server; 2 - connected
+        # without match; 3 - waiting move (even if it's the local player's turn)
         self.move_order = 0
         self.url = "https://api-dog-server.herokuapp.com/"
 
@@ -102,9 +104,9 @@ class DogProxy:
         post_data = {"player_id": self.player_id, "game_id": self.game_id, "move": json_move}
         resp = requests.post(url, data=post_data)
         if a_move["match_status"] == "next":
-            self.status = 3  #   pass the turn and start looking for a move
+            self.status = 3  # pass the turn and start looking for a move
         elif a_move["match_status"] == "finished":
-            self.status = 2  #   connected without match
+            self.status = 2  # connected without match
         return resp.text
 
     def match_status(self):
@@ -116,17 +118,17 @@ class DogProxy:
         if bool(seek_result):
             move_dictionary = eval(
                 seek_result["1"]
-            )  #   move is contained in seek_result as a string (to be converted in dictionary)
+            )  # move is contained in seek_result as a string (to be converted in dictionary)
             if bool(move_dictionary):
                 match_status = move_dictionary["match_status"]
-                if match_status == "interrupted":  #  an opponent has abandoned the match
+                if match_status == "interrupted":  # an opponent has abandoned the match
                     self.dog_actor.receive_withdrawal_notification()
                     self.status = 2
                 else:
                     move_player_id = move_dictionary["player"]
                     move_player_order = move_dictionary["order"]
-                    if move_player_id != str(self.player_id):  #  not from the player himself
-                        if int(move_player_order) > self.move_order:  #  not an already handled move
+                    if move_player_id != str(self.player_id):  # not from the player himself
+                        if int(move_player_order) > self.move_order:  # not an already handled move
                             self.move_order = int(move_player_order)
                             self.dog_actor.receive_move(move_dictionary)
                             if move_dictionary["match_status"] == "finished":

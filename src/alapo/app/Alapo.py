@@ -4,6 +4,7 @@ from alapo.app.meta.EventEnum import EventEnum
 from alapo.app.meta.EventManager import EventData, EventManager
 from alapo.dog_fmw.dog.dog_actor import DogActor
 
+
 class Alapo:
     def __init__(self) -> None:
         self.__eventManager = EventManager()
