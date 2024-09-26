@@ -3,8 +3,15 @@ from datetime import datetime
 from typing import Any, Callable, Dict, Optional, Set
 
 from alapo.app.config import Config
-from alapo.app.meta.EventEnum import EventEnum
 from alapo.app.meta.Singleton import Singleton
+from enum import Enum, auto
+
+
+class EventEnum(Enum):
+    START_APP = auto()
+    RECEIVE_START_MATCH = auto()
+    RECEIVE_MOVE = auto()
+    RECEIVE_WITHDRAWAL = auto()
 
 
 @dataclass

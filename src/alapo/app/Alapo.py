@@ -1,7 +1,6 @@
 from alapo.app.GraphicalUserInterface import GraphicalUserInterface
 from alapo.app.Tabuleiro import Tabuleiro
-from alapo.app.meta.EventEnum import EventEnum
-from alapo.app.meta.EventManager import EventData, EventManager
+from alapo.app.meta.EventManager import EventData, EventManager, EventEnum
 from alapo.dog_fmw.dog.dog_actor import DogActor
 
 
@@ -14,8 +13,8 @@ class Alapo:
         self.__setupSubscriptions()
 
     def start(self) -> None:
-        self.__doc_actor.initialize("fulano", self.__gui)
         self.__gui.initialize()
+        self.__doc_actor.initialize("fulano", self.__gui)
 
     def __setupSubscriptions(self) -> None:
         # self.__eventManager.subscribe(EventEnum.RECEIVE_START_MATCH , self.__setup_match) # DEBUG

@@ -1,9 +1,7 @@
-from typing import Any, List
-from alapo.app.Peca import Peca
-from alapo.app.TipoPecaEnum import TipoPecaEnum
+from typing import List
+from alapo.app.Peca import CorPecaEnum, Peca, TipoPecaEnum
 from alapo.app.config import Config
-from alapo.app.meta.EventEnum import EventEnum
-from alapo.app.meta.EventManager import EventManager
+from alapo.app.meta.EventManager import EventManager, EventEnum
 from tkinter import Button, Entry, Tk, Canvas, Frame, Label
 from itertools import cycle
 
@@ -13,7 +11,11 @@ from alapo.dog_fmw.dog.start_status import StartStatus
 
 class GraphicalUserInterface(DogPlayerInterface):
     def __init__(self):
-        self.__colors = [Config.DARK, Config.LIGHT]
+        self.__tile_colors = [Config.DARK, Config.LIGHT]
+        self.__piece_colors = {
+            CorPecaEnum.PRETO: Config.BLACK,
+            CorPecaEnum.BRANCO: Config.WHITE
+        }
         self.__size = Config.BOARD_SIZE
         self.__eventManager = EventManager()
         self.__window = None
@@ -39,9 +41,9 @@ class GraphicalUserInterface(DogPlayerInterface):
         self.__canvas.delete("piece")
         for i in range(Config.BOARD_SIZE):
             for j in range(Config.BOARD_SIZE):
-                position = current_state[j][i]
-                if position is not None:
-                    self.__draw_piece(i, j, position.tipo, black=j > 3)     # DEBUG
+                peca = current_state[j][i]
+                if peca is not None:
+                    self.__draw_piece(i, j, peca.tipo, peca.cor)     # DEBUG
 
     def __draw_app(self) -> None:
         self.__draw_rpanel()
@@ -64,23 +66,25 @@ class GraphicalUserInterface(DogPlayerInterface):
         start_button.grid(row=2, column=0, columnspan=2, pady=20)
 
     def __draw_board(self) -> None:
-        self.__canvas = Canvas(self.__window, width=768, height=768)
-        self.__canvas.grid(row=0, column=1, columnspan=8, rowspan=8)
+        self.__canvas = Canvas(self.__window, width=568, height=568)
+        self.__canvas.grid(row=0, column=1, columnspan=8, rowspan=8, pady=(0, 125))
         for i in range(self.__size):
-            color = cycle(self.__colors[::-1] if not i % 2 else self.__colors)
+            color = cycle(self.__tile_colors[::-1] if not i % 2 else self.__tile_colors)
             for j in range(self.__size):
                 self.__draw_tile(i, j, color)
 
     def __draw_tile(self, i: int, j: int, color: cycle) -> None:
+        tag_prefix = "tile"
         args = self.__calculate_position(i, j)
-        kwargs = {**self.__default_tk_kwargs(), **{"fill": next(color), "tags": f"tile{i + 1}{j + 1}"}}
+        kwargs = {**self.__default_tk_kwargs(), **{"fill": next(color), "tags": f"{tag_prefix}{i + 1}{j + 1}"}}
         self.__canvas.create_rectangle(*args, **kwargs)
-        self.__bind_tag(i, j, "tile")
+        self.__bind_tag(i, j, tag_prefix)
 
-    def __draw_piece(self, i: int, j: int, tipo: TipoPecaEnum, black: bool) -> None:
+    def __draw_piece(self, i: int, j: int, tipo: TipoPecaEnum, cor: CorPecaEnum) -> None:
+        tag_prefix = "piece"
         kwargs = {**self.__default_tk_kwargs(),
-                  **{"fill": "#000000" if black else "#FFFFFF",
-                     "tags": f"piece{i + 1}{j + 1}"}}
+                  **{"fill": self.__piece_colors[cor],
+                     "tags": f"{tag_prefix}{i + 1}{j + 1}"}}
         match tipo:
             case TipoPecaEnum.TRIANGULAR_GRANDE:
                 args = self.__resolve_triangle(i, j, False)
@@ -96,7 +100,7 @@ class GraphicalUserInterface(DogPlayerInterface):
                 self.__canvas.create_rectangle(*self.__calculate_position(i, j, True, True), **kwargs)
             case TipoPecaEnum.CIRCULAR_PEQUENA:
                 self.__canvas.create_oval(*self.__calculate_position(i, j, True, True), **kwargs)
-        self.__bind_tag(i, j, "piece")
+        self.__bind_tag(i, j, tag_prefix)
 
     def __bind_tag(self, i: int, j: int, tag_prexfix: str):
         self.__canvas.tag_bind(f"{tag_prexfix}{i + 1}{j + 1}", "<Button-1>", lambda _, i=i + 1,
@@ -112,10 +116,10 @@ class GraphicalUserInterface(DogPlayerInterface):
                                                              float,
                                                              float]:
         horizontal_padding = Config.BOARD_PADDING_SCALE * 3 if half_size else Config.BOARD_PADDING_SCALE
-        vertical_padding = Config.BOARD_PADDING_SCALE * 4.5 if half_size else Config.BOARD_PADDING_SCALE
+        vertical_padding = Config.BOARD_PADDING_SCALE * 5.1 if half_size else Config.BOARD_PADDING_SCALE
         defaults = self.__calculate_position(i, j, False)
         side_length = Config.BOARD_SCALE
-        x1, y1 = defaults[0] + 45, defaults[1] + horizontal_padding
+        x1, y1 = defaults[0] + Config.BOARD_SCALE / 2, defaults[1] + horizontal_padding
         x2, y2 = x1 - (side_length / 2) + horizontal_padding, y1 + (side_length * (3 ** 0.5) / 2) - vertical_padding
         x3, y3 = x1 + (side_length / 2) - horizontal_padding, y2
 
