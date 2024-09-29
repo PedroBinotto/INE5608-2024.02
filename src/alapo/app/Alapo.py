@@ -14,8 +14,11 @@ class Alapo:
         self.__setupSubscriptions()
 
     def start(self) -> None:
+        self.__eventManager.post(
+            EventEnum.RECEIVE_DOG_RESPONSE,
+            {"msg": self.__doc_actor.initialize("fulano", self.__gui)},
+        )
         self.__gui.initialize()
-        self.__doc_actor.initialize("fulano", self.__gui)
 
     def __setupSubscriptions(self) -> None:
         self.__eventManager.subscribe(EventEnum.RECEIVE_MOVE, self.__receive_move)
@@ -26,6 +29,10 @@ class Alapo:
 
     def __setup_match(self, _: EventData) -> None:
         Config.LOG_OUT("Alapo::__setup_match", "RECEIVE_START")
+        self.__eventManager.post(
+            EventEnum.RECEIVE_DOG_RESPONSE,
+            {"msg": self.__doc_actor.start_match(2).get_message()},
+        )
         self.__board.setup()
         self.__gui.update_board_display(self.__board.matrix)
 

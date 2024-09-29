@@ -1,8 +1,9 @@
 from typing import Any, List
 from alapo.app.Peca import CorPecaEnum, Peca, TipoPecaEnum
 from alapo.app.config import Config
-from alapo.app.meta.EventManager import EventManager, EventEnum
+from alapo.app.meta.EventManager import EventData, EventManager, EventEnum
 from tkinter import Button, Entry, Tk, Canvas, Frame, Label
+from tkinter.messagebox import showinfo
 from itertools import cycle
 
 from alapo.dog_fmw.dog.dog_interface import DogPlayerInterface
@@ -21,21 +22,20 @@ class GraphicalUserInterface(DogPlayerInterface):
         self.__window: Tk = None
         self.__canvas: Canvas = None
         self.__username_field: Entry = None
+        self.__setupSubscriptions()
 
     def initialize(self) -> None:
-        def on_destroy(*_: Any) -> None:
-            self.receive_withdrawal_notification()
-
         self.__window = Tk()
-        self.__window.bind("<Destroy>", on_destroy)
         self.__window.title(Config.APP_NAME)
         self.__draw_app()
         self.__window.mainloop()
 
     def receive_start(self, start_status: StartStatus) -> None:
+        self.__show_popup_message("Recebe início")
         self.__eventManager.post(EventEnum.RECEIVE_START_MATCH, start_status)
 
     def receive_move(self, a_move) -> None:
+        self.__show_popup_message("Recebe movimento")
         self.__eventManager.post(EventEnum.RECEIVE_MOVE, a_move)
 
     def receive_withdrawal_notification(self) -> None:
@@ -48,6 +48,9 @@ class GraphicalUserInterface(DogPlayerInterface):
                 peca = board_state[j][i]
                 if peca is not None:
                     self.__draw_board_piece(i, j, peca.tipo, peca.cor)  # DEBUG
+
+    def __show_popup_message(self, msg: str) -> None:
+        showinfo(Config.APP_NAME, f"MENSAGEM: {msg}")
 
     def __draw_app(self) -> None:
         self.__draw_menu_panel()
@@ -185,6 +188,14 @@ class GraphicalUserInterface(DogPlayerInterface):
             (i * Config.BOARD_SCALE + Config.BOARD_SCALE) - padding,
             (((Config.BOARD_SIZE + 1) - j) * Config.BOARD_SCALE + Config.BOARD_SCALE)
             - padding,
+        )
+
+    def __setupSubscriptions(self) -> None:
+        def displayConnectionNotification(event: EventData) -> None:
+            self.__show_popup_message(event.data["msg"])
+
+        self.__eventManager.subscribe(
+            EventEnum.RECEIVE_DOG_RESPONSE, displayConnectionNotification
         )
 
     def __resolve_tk_kwargs(self) -> dict[str, str]:
