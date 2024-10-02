@@ -23,3 +23,5 @@
 *.snm
 *.toc
 .*.lb
+*_latexmk
+*.synctex.gz
