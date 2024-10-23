@@ -1,5 +1,5 @@
-from typing import Any, List
-from alapo.app.Peca import CorPecaEnum, Peca, TipoPecaEnum
+from typing import List
+from alapo.app.Piece import PieceColorEnum, Piece, PieceTypeEnum
 from alapo.app.config import Config
 from alapo.app.meta.EventManager import EventData, EventManager, EventEnum
 from tkinter import Button, Entry, Tk, Canvas, Frame, Label
@@ -13,9 +13,9 @@ from alapo.dog_fmw.dog.start_status import StartStatus
 class GraphicalUserInterface(DogPlayerInterface):
     def __init__(self):
         self.__tile_colors: list[str] = [Config.DARK, Config.LIGHT]
-        self.__piece_colors: dict[CorPecaEnum, str] = {
-            CorPecaEnum.PRETO: Config.BLACK,
-            CorPecaEnum.BRANCO: Config.WHITE,
+        self.__piece_colors: dict[PieceColorEnum, str] = {
+            PieceColorEnum.BLACK: Config.BLACK,
+            PieceColorEnum.WHITE: Config.WHITE,
         }
         self.__size = Config.BOARD_SIZE
         self.__eventManager = EventManager()
@@ -41,7 +41,7 @@ class GraphicalUserInterface(DogPlayerInterface):
     def receive_withdrawal_notification(self) -> None:
         self.__eventManager.post(EventEnum.RECEIVE_WITHDRAWAL)
 
-    def update_board_display(self, board_state: List[List[Peca | None]]) -> None:
+    def update_board_display(self, board_state: List[List[Piece | None]]) -> None:
         self.__canvas.delete("piece")
         for i in range(Config.BOARD_SIZE):
             for j in range(Config.BOARD_SIZE):
@@ -99,7 +99,7 @@ class GraphicalUserInterface(DogPlayerInterface):
         self.__bind_tag(i, j, tag_prefix)
 
     def __draw_board_piece(
-        self, i: int, j: int, tipo: TipoPecaEnum, cor: CorPecaEnum
+        self, i: int, j: int, tipo: PieceTypeEnum, cor: PieceColorEnum
     ) -> None:
         def resolve_triange_vertices(
             i: int, j: int, half_size: bool = False
@@ -134,25 +134,25 @@ class GraphicalUserInterface(DogPlayerInterface):
             **{"fill": self.__piece_colors[cor], "tags": f"{tag_prefix}{i + 1}{j + 1}"},
         }
         match tipo:
-            case TipoPecaEnum.TRIANGULAR_GRANDE:
+            case PieceTypeEnum.TRIANGLE_LARGE:
                 args = resolve_triange_vertices(i, j, False)
                 self.__canvas.create_polygon(*args, **kwargs)
-            case TipoPecaEnum.QUADRADA_GRANDE:
+            case PieceTypeEnum.SQUARE_LARGE:
                 self.__canvas.create_rectangle(
                     *self.__resolve_polygon_vertices(i, j, True), **kwargs
                 )
-            case TipoPecaEnum.CIRCULAR_GRANDE:
+            case PieceTypeEnum.CIRCLE_LARGE:
                 self.__canvas.create_oval(
                     *self.__resolve_polygon_vertices(i, j, True), **kwargs
                 )
-            case TipoPecaEnum.TRIANGULAR_PEQUENA:
+            case PieceTypeEnum.TRIANGLE_SMALL:
                 args = resolve_triange_vertices(i, j, True)
                 self.__canvas.create_polygon(*args, **kwargs)
-            case TipoPecaEnum.QUADRADA_PEQUENA:
+            case PieceTypeEnum.SQUARE_SMALL:
                 self.__canvas.create_rectangle(
                     *self.__resolve_polygon_vertices(i, j, True, True), **kwargs
                 )
-            case TipoPecaEnum.CIRCULAR_PEQUENA:
+            case PieceTypeEnum.CIRCLE_SMALL:
                 self.__canvas.create_oval(
                     *self.__resolve_polygon_vertices(i, j, True, True), **kwargs
                 )

@@ -1,5 +1,5 @@
 from alapo.app.GraphicalUserInterface import GraphicalUserInterface
-from alapo.app.Tabuleiro import Tabuleiro
+from alapo.app.Board import Board
 from alapo.app.config import Config
 from alapo.app.meta.EventManager import EventData, EventManager, EventEnum
 from alapo.dog_fmw.dog.dog_actor import DogActor
@@ -8,7 +8,7 @@ from alapo.dog_fmw.dog.dog_actor import DogActor
 class Alapo:
     def __init__(self) -> None:
         self.__eventManager = EventManager()
-        self.__board = Tabuleiro()
+        self.__board = Board()
         self.__gui = GraphicalUserInterface()
         self.__doc_actor = DogActor()
         self.__setupSubscriptions()
