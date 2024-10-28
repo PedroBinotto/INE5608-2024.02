@@ -1,4 +1,6 @@
-# INE5608 - Entrega 1
+# INE5608 - Entrega 2
+
+- [Vídeo de apresentação - Pedro Binotto](https://drive.google.com/file/d/1our3DPlACM2zNC5stGJQS-zVWJJMdduL/view?usp=drive_link)
 
 O projeto está organizado da seguinte maneira:
 
