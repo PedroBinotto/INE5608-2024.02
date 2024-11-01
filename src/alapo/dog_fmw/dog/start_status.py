@@ -1,10 +1,13 @@
+type Player = list[str]
+
+
 class StartStatus:
     def __init__(self, code, message, players, local_id):
         super().__init__()
         self.local_id = local_id
         self.code = code
         self.message = message
-        self.players = players
+        self.players: list[Player] = players
 
     def get_local_id(self):
         return self.local_id

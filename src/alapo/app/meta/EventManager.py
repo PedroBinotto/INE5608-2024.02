@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Callable, Dict, Optional, Set
+from typing import Any, Callable, Dict, Generic, Optional, Set, TypeVar
 
 from alapo.app.config import Config
 from alapo.app.meta.Singleton import Singleton
@@ -9,15 +9,21 @@ from enum import Enum, auto
 
 class EventEnum(Enum):
     START_APP = auto()
+    START_MATCH = auto()
     RECEIVE_DOG_RESPONSE = auto()
     RECEIVE_START_MATCH = auto()
     RECEIVE_MOVE = auto()
+    BOARD_INPUT = auto()
     RECEIVE_WITHDRAWAL = auto()
+    SERVER_SIDE_ERR = auto()
+
+
+T = TypeVar("T")
 
 
 @dataclass
-class EventData:
-    data: Optional[Any]
+class EventData(Generic[T]):
+    data: Optional[T]
     event: EventEnum
 
 

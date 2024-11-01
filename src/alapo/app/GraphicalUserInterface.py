@@ -1,9 +1,11 @@
 from typing import List
+from alapo.app.Board import BoardInput, Move
 from alapo.app.Piece import PieceColorEnum, Piece, PieceTypeEnum
 from alapo.app.config import Config
 from alapo.app.meta.EventManager import EventData, EventManager, EventEnum
-from tkinter import Button, Entry, Tk, Canvas, Frame, Label
+from tkinter import Button, Tk, Canvas, Frame, Label
 from tkinter.messagebox import showinfo
+from tkinter.simpledialog import askstring
 from itertools import cycle
 
 from alapo.dog_fmw.dog.dog_interface import DogPlayerInterface
@@ -12,6 +14,7 @@ from alapo.dog_fmw.dog.start_status import StartStatus
 
 class GraphicalUserInterface(DogPlayerInterface):
     def __init__(self):
+        self.__start_button: Button = None
         self.__tile_colors: list[str] = [Config.DARK, Config.LIGHT]
         self.__piece_colors: dict[PieceColorEnum, str] = {
             PieceColorEnum.BLACK: Config.BLACK,
@@ -21,7 +24,6 @@ class GraphicalUserInterface(DogPlayerInterface):
         self.__eventManager = EventManager()
         self.__window: Tk = None
         self.__canvas: Canvas = None
-        self.__username_field: Entry = None
         self.__setupSubscriptions()
 
     def initialize(self) -> None:
@@ -30,27 +32,46 @@ class GraphicalUserInterface(DogPlayerInterface):
         self.__draw_app()
         self.__window.mainloop()
 
+    def get_username(self) -> str:
+        return self.__show_prompt_message("Informe o nome do jogador:")
+
     def receive_start(self, start_status: StartStatus) -> None:
-        self.__show_popup_message("Recebe início")
+        self.set_start_button_state(False)
         self.__eventManager.post(EventEnum.RECEIVE_START_MATCH, start_status)
 
     def receive_move(self, a_move) -> None:
-        self.__show_popup_message("Recebe movimento")
-        self.__eventManager.post(EventEnum.RECEIVE_MOVE, a_move)
+        self.show_popup_message("Recebe movimento")
+        self.__eventManager.post(
+            EventEnum.RECEIVE_MOVE,
+            Move(
+                BoardInput(a_move["origin"]["x"], a_move["origin"]["y"]),
+                BoardInput(a_move["destination"]["x"], a_move["destination"]["y"]),
+            ),
+        )
 
     def receive_withdrawal_notification(self) -> None:
+        self.set_start_button_state(True)
         self.__eventManager.post(EventEnum.RECEIVE_WITHDRAWAL)
 
     def update_board_display(self, board_state: List[List[Piece | None]]) -> None:
         self.__canvas.delete("piece")
         for i in range(Config.BOARD_SIZE):
             for j in range(Config.BOARD_SIZE):
-                peca = board_state[j][i]
+                peca = board_state[i][j]
                 if peca is not None:
                     self.__draw_board_piece(i, j, peca.tipo, peca.cor)  # DEBUG
 
-    def __show_popup_message(self, msg: str) -> None:
+    def show_popup_message(self, msg: str) -> None:
         showinfo(Config.APP_NAME, f"MENSAGEM: {msg}")
+
+    def set_start_button_state(self, active: bool) -> None:
+        self.__start_button["state"] = "normal" if active else "disabled"
+
+    def __board_click(self, move: BoardInput):
+        self.__eventManager.post(EventEnum.BOARD_INPUT, move)
+
+    def __show_prompt_message(self, msg: str) -> str:
+        return askstring(Config.APP_NAME, prompt=msg)
 
     def __draw_app(self) -> None:
         self.__draw_menu_panel()
@@ -58,7 +79,8 @@ class GraphicalUserInterface(DogPlayerInterface):
 
     def __draw_menu_panel(self) -> None:
         def on_iniciar_partida(*_):
-            self.receive_start(StartStatus("", "", "", ""))
+            self.set_start_button_state(False)
+            self.__eventManager.post(EventEnum.START_MATCH)
 
         rightframe = Frame(self.__window)
         rightframe.grid(row=0, column=0, rowspan=10, padx=100)
@@ -66,19 +88,13 @@ class GraphicalUserInterface(DogPlayerInterface):
         label = Label(rightframe, text="Alapo", font=("Arial", 16))
         label.grid(row=0, column=0, pady=10, columnspan=2)
 
-        username_label = Label(rightframe, text="Nome do jogador:", font=("Arial", 12))
-        username_label.grid(row=1, column=0, padx=10, pady=10)
-
-        self.__username_field = Entry(rightframe, font=("Arial", 12), width=20)
-        self.__username_field.grid(row=1, column=1, padx=10, pady=10)
-
-        start_button = Button(
+        self.__start_button = Button(
             rightframe,
             text="Iniciar partida",
             font=("Arial", 12),
             command=on_iniciar_partida,
         )
-        start_button.grid(row=2, column=0, columnspan=2, pady=20)
+        self.__start_button.grid(row=2, column=0, columnspan=2, pady=20)
 
     def __draw_board_canvas(self) -> None:
         self.__canvas = Canvas(self.__window, width=568, height=568)
@@ -93,7 +109,7 @@ class GraphicalUserInterface(DogPlayerInterface):
         args = self.__resolve_polygon_vertices(i, j)
         kwargs = {
             **self.__resolve_tk_kwargs(),
-            **{"fill": next(color), "tags": f"{tag_prefix}{i + 1}{j + 1}"},
+            **{"fill": next(color), "tags": f"{tag_prefix}{i}{j}"},
         }
         self.__canvas.create_rectangle(*args, **kwargs)
         self.__bind_tag(i, j, tag_prefix)
@@ -131,7 +147,7 @@ class GraphicalUserInterface(DogPlayerInterface):
         tag_prefix = "piece"
         kwargs = {
             **self.__resolve_tk_kwargs(),
-            **{"fill": self.__piece_colors[cor], "tags": f"{tag_prefix}{i + 1}{j + 1}"},
+            **{"fill": self.__piece_colors[cor], "tags": f"{tag_prefix}{i}{j}"},
         }
         match tipo:
             case PieceTypeEnum.TRIANGLE_LARGE:
@@ -160,14 +176,9 @@ class GraphicalUserInterface(DogPlayerInterface):
 
     def __bind_tag(self, i: int, j: int, tag_prexfix: str):
         self.__canvas.tag_bind(
-            f"{tag_prexfix}{i + 1}{j + 1}",
+            f"{tag_prexfix}{i}{j}",
             "<Button-1>",
-            lambda _, i=i + 1, j=j + 1: self.receive_move(
-                {
-                    "x": i,
-                    "y": j,
-                }
-            ),
+            lambda _, i=i, j=j: self.__board_click(BoardInput(x=i, y=j)),
         )  # type: ignore[misc]
 
     def __resolve_polygon_vertices(
@@ -191,12 +202,19 @@ class GraphicalUserInterface(DogPlayerInterface):
         )
 
     def __setupSubscriptions(self) -> None:
-        def displayConnectionNotification(event: EventData) -> None:
-            self.__show_popup_message(event.data["msg"])
+        def display_connection_notification(event: EventData[str]) -> None:
+            self.show_popup_message(event.data)
+
+        def on_error(_: EventData[str]) -> None:
+            self.set_start_button_state(True)
 
         self.__eventManager.subscribe(
-            EventEnum.RECEIVE_DOG_RESPONSE, displayConnectionNotification
+            EventEnum.RECEIVE_DOG_RESPONSE, display_connection_notification
         )
+        self.__eventManager.subscribe(
+            EventEnum.SERVER_SIDE_ERR, display_connection_notification
+        )
+        self.__eventManager.subscribe(EventEnum.SERVER_SIDE_ERR, on_error)
 
     def __resolve_tk_kwargs(self) -> dict[str, str]:
         return {"outline": ""}
