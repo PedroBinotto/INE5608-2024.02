@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum, auto
 from alapo.app.GraphicalUserInterface import GraphicalUserInterface
-from alapo.app.Board import Board, BoardInput, Move
+from alapo.app.Board import Board, Coordinates, Move
 from alapo.app.Piece import PieceColorEnum
 from alapo.app.config import Config
 from alapo.app.meta.EventManager import EventData, EventManager, EventEnum
@@ -13,7 +13,7 @@ from alapo.dog_fmw.dog.start_status import StartStatus
 class Player:
     id: str
     name: str
-    # color: PieceColorEnum
+    color: PieceColorEnum
 
 
 class MatchStateEnum(Enum):
@@ -21,7 +21,6 @@ class MatchStateEnum(Enum):
     WAITING_REMOTE = auto()
     WAITING_SELECT_PIECE = auto()
     WAITING_SELECT_DEST = auto()
-    CHECK = auto()
     FINISHED_BY_TIE = auto()
     FINISHED_BY_VICTORY = auto()
 
@@ -29,9 +28,9 @@ class MatchStateEnum(Enum):
 class Alapo:
     def __init__(self) -> None:
         self.__match_state: MatchStateEnum = None
-        self.__local_buffer: BoardInput = None
-        self.__local_player: Player = None
+        self.__local_buffer: Coordinates = None
         self.__is_player_two: bool = None
+        self.__local_player: Player = None
         self.__remote_player: Player = None
         self.__eventManager = EventManager()
         self.__board = Board()
@@ -84,50 +83,77 @@ class Alapo:
 
         self.__is_player_two = int(local_player[2]) == 2
 
-        self.__local_player = Player(local_player[1], local_player[0])
-        self.__remote_player = Player(remote_player[1], remote_player[0])
-
         if self.__is_player_two:
             self.__match_state = MatchStateEnum.WAITING_REMOTE
+            color = PieceColorEnum.WHITE
         else:
             self.__match_state = MatchStateEnum.WAITING_SELECT_PIECE
+            color = PieceColorEnum.BLACK
+
+        self.__local_player = Player(local_player[1], local_player[0], color)
+        self.__remote_player = Player(remote_player[1], remote_player[0], color)
 
         self.__board.setup()
         self.__refresh()
+
+        if not self.__is_player_two:
+            self.__highlight_pieces()
 
         self.__gui.show_popup_message(
             f"Partida iniciada contra {self.__remote_player.name}!"
         )
 
-    def __process_board_click(self, event: EventData[BoardInput]) -> None:
+    def __process_board_click(self, event: EventData[Coordinates]) -> None:
         if self.__is_player_two:
-            input = BoardInput(**self.__rotate_input((event.data.x, event.data.y)))
+            input = Coordinates(*self.__rotate_input((event.data.x, event.data.y)))
         else:
             input = event.data
 
         if self.__match_state == MatchStateEnum.WAITING_SELECT_PIECE:
             self.__local_buffer = input
             self.__match_state = MatchStateEnum.WAITING_SELECT_DEST
+            self.__highlight_destinations(event.data)
         elif self.__match_state == MatchStateEnum.WAITING_SELECT_DEST:
-            self.__register_move(Move(self.__local_buffer, input))
-            self.__dog_actor.send_move(
-                {
-                    "origin": {"x": self.__local_buffer.x, "y": self.__local_buffer.y},
-                    "destination": {
-                        "x": input.x,
-                        "y": input.y,
-                    },
-                }
-            )
+            self.__gui.clear_highlights()
+            move = Move(self.__local_buffer, input)
+            self.__register_move(move)
+            self.__dog_actor.send_move(self.__serialize_move(move))
+            self.__match_state = MatchStateEnum.WAITING_REMOTE
 
     def __receive_move(self, event: EventData[Move]):
+        print("__receive_move", event.data)
         self.__register_move(event.data)
+        self.__match_state = MatchStateEnum.WAITING_SELECT_PIECE
+        self.__highlight_pieces()
 
-    def __validate_input(self, input: BoardInput):
-        print("in position: ", f"x: {input.x}, y: {input.y}", self.__board.read(input))
+    def __highlight_pieces(self):
+        self.__gui.clear_highlights()
+        for position in self.__board.get_available_pieces(self.__local_player.color):
+            if self.__is_player_two:
+                x, y = self.__rotate_input((position.x, position.y))
+            else:
+                x, y = position.x, position.y
+
+            self.__gui.draw_board_highlight(x, y)
+
+    def __highlight_destinations(self, origin: Coordinates):
+        self.__gui.clear_highlights()
+        for position in self.__board.get_available_destinations(origin):
+            x, y = position.x, position.y
+            self.__gui.draw_board_highlight(x, y)
+
+    def __highlight_pieces(self):
+        self.__gui.clear_highlights()
+        for position in self.__board.get_available_pieces(self.__local_player.color):
+            if self.__is_player_two:
+                x, y = self.__rotate_input((position.x, position.y))
+            else:
+                x, y = position.x, position.y
+
+            self.__gui.draw_board_highlight(x, y)
 
     def __register_move(self, move: Move) -> None:
-        self.__board.apply_move(move.origin, move.destination)
+        self.__board.apply_move(move)
         self.__refresh()
 
     def __receive_withdrawal(self, _: EventData[None]) -> None:
@@ -154,3 +180,13 @@ class Alapo:
             if not self.__is_player_two
             else self.__rotate_matrix(self.__board.matrix)
         )
+
+    def __serialize_move(self, move: Move, status: str = "next") -> dict:
+        return {
+            "match_status": status,
+            "origin": {"x": move.origin.x, "y": move.origin.y},
+            "destination": {
+                "x": move.destination.x,
+                "y": move.destination.y,
+            },
+        }

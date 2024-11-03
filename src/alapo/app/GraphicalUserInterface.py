@@ -1,5 +1,5 @@
 from typing import List
-from alapo.app.Board import BoardInput, Move
+from alapo.app.Board import Coordinates, Move
 from alapo.app.Piece import PieceColorEnum, Piece, PieceTypeEnum
 from alapo.app.config import Config
 from alapo.app.meta.EventManager import EventData, EventManager, EventEnum
@@ -42,11 +42,7 @@ class GraphicalUserInterface(DogPlayerInterface):
     def receive_move(self, a_move) -> None:
         self.show_popup_message("Recebe movimento")
         self.__eventManager.post(
-            EventEnum.RECEIVE_MOVE,
-            Move(
-                BoardInput(a_move["origin"]["x"], a_move["origin"]["y"]),
-                BoardInput(a_move["destination"]["x"], a_move["destination"]["y"]),
-            ),
+            EventEnum.RECEIVE_MOVE, self.__deserialize_move(a_move)
         )
 
     def receive_withdrawal_notification(self) -> None:
@@ -59,7 +55,7 @@ class GraphicalUserInterface(DogPlayerInterface):
             for j in range(Config.BOARD_SIZE):
                 peca = board_state[i][j]
                 if peca is not None:
-                    self.__draw_board_piece(i, j, peca.tipo, peca.cor)  # DEBUG
+                    self.__draw_board_piece(i, j, peca.type, peca.color)  # DEBUG
 
     def show_popup_message(self, msg: str) -> None:
         showinfo(Config.APP_NAME, f"MENSAGEM: {msg}")
@@ -67,7 +63,7 @@ class GraphicalUserInterface(DogPlayerInterface):
     def set_start_button_state(self, active: bool) -> None:
         self.__start_button["state"] = "normal" if active else "disabled"
 
-    def __board_click(self, move: BoardInput):
+    def __board_click(self, move: Coordinates):
         self.__eventManager.post(EventEnum.BOARD_INPUT, move)
 
     def __show_prompt_message(self, msg: str) -> str:
@@ -112,7 +108,24 @@ class GraphicalUserInterface(DogPlayerInterface):
             **{"fill": next(color), "tags": f"{tag_prefix}{i}{j}"},
         }
         self.__canvas.create_rectangle(*args, **kwargs)
-        self.__bind_tag(i, j, tag_prefix)
+        self.__bind_button_tag(i, j, tag_prefix)
+
+    def clear_highlights(self):
+        self.__canvas.delete("highlight")
+
+    def draw_board_highlight(self, i: int, j: int) -> None:
+        tag_prefix = "highlight"
+        args = self.__resolve_polygon_vertices(i, j)
+        kwargs = {
+            **self.__resolve_tk_kwargs(),
+            **{
+                "fill": "",
+                "outline": "red",
+                "width": 5,
+                "tags": (f"{tag_prefix}{i}{j}", tag_prefix),
+            },
+        }
+        self.__canvas.create_rectangle(*args, **kwargs)
 
     def __draw_board_piece(
         self, i: int, j: int, tipo: PieceTypeEnum, cor: PieceColorEnum
@@ -147,7 +160,10 @@ class GraphicalUserInterface(DogPlayerInterface):
         tag_prefix = "piece"
         kwargs = {
             **self.__resolve_tk_kwargs(),
-            **{"fill": self.__piece_colors[cor], "tags": f"{tag_prefix}{i}{j}"},
+            **{
+                "fill": self.__piece_colors[cor],
+                "tags": (f"{tag_prefix}{i}{j}", tag_prefix),
+            },
         }
         match tipo:
             case PieceTypeEnum.TRIANGLE_LARGE:
@@ -172,13 +188,13 @@ class GraphicalUserInterface(DogPlayerInterface):
                 self.__canvas.create_oval(
                     *self.__resolve_polygon_vertices(i, j, True, True), **kwargs
                 )
-        self.__bind_tag(i, j, tag_prefix)
+        self.__bind_button_tag(i, j, tag_prefix)
 
-    def __bind_tag(self, i: int, j: int, tag_prexfix: str):
+    def __bind_button_tag(self, i: int, j: int, tag_prexfix: str):
         self.__canvas.tag_bind(
             f"{tag_prexfix}{i}{j}",
             "<Button-1>",
-            lambda _, i=i, j=j: self.__board_click(BoardInput(x=i, y=j)),
+            lambda _, i=i, j=j: self.__board_click(Coordinates(x=i, y=j)),
         )  # type: ignore[misc]
 
     def __resolve_polygon_vertices(
@@ -218,3 +234,9 @@ class GraphicalUserInterface(DogPlayerInterface):
 
     def __resolve_tk_kwargs(self) -> dict[str, str]:
         return {"outline": ""}
+
+    def __deserialize_move(self, move: dict) -> Move:
+        return Move(
+            Coordinates(move["origin"]["x"], move["origin"]["y"]),
+            Coordinates(move["destination"]["x"], move["destination"]["y"]),
+        )

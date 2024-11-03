@@ -16,14 +16,14 @@ class PieceColorEnum(Enum):
 
 
 class Piece:
-    def __init__(self, tipo: PieceTypeEnum, cor: PieceColorEnum) -> None:
-        self.__tipo = tipo
-        self.__cor = cor
+    def __init__(self, type: PieceTypeEnum, color: PieceColorEnum) -> None:
+        self.__type = type
+        self.__color = color
 
     @property
-    def tipo(self) -> PieceTypeEnum:
-        return self.__tipo
+    def type(self) -> PieceTypeEnum:
+        return self.__type
 
     @property
-    def cor(self) -> PieceColorEnum:
-        return self.__cor
+    def color(self) -> PieceColorEnum:
+        return self.__color
