@@ -21,7 +21,7 @@ class GraphicalUserInterface(DogPlayerInterface):
             PieceColorEnum.WHITE: Config.WHITE,
         }
         self.__size = Config.BOARD_SIZE
-        self.__eventManager = EventManager()
+        self.__event_manager = EventManager()
         self.__window: Tk = None
         self.__canvas: Canvas = None
         self.__setupSubscriptions()
@@ -37,17 +37,17 @@ class GraphicalUserInterface(DogPlayerInterface):
 
     def receive_start(self, start_status: StartStatus) -> None:
         self.set_start_button_state(False)
-        self.__eventManager.post(EventEnum.RECEIVE_START_MATCH, start_status)
+        self.__event_manager.post(EventEnum.RECEIVE_START_MATCH, start_status)
 
     def receive_move(self, a_move) -> None:
         self.show_popup_message("Recebe movimento")
-        self.__eventManager.post(
+        self.__event_manager.post(
             EventEnum.RECEIVE_MOVE, self.__deserialize_move(a_move)
         )
 
     def receive_withdrawal_notification(self) -> None:
         self.set_start_button_state(True)
-        self.__eventManager.post(EventEnum.RECEIVE_WITHDRAWAL)
+        self.__event_manager.post(EventEnum.RECEIVE_WITHDRAWAL)
 
     def update_board_display(self, board_state: List[List[Piece | None]]) -> None:
         self.__canvas.delete("piece")
@@ -63,8 +63,8 @@ class GraphicalUserInterface(DogPlayerInterface):
     def set_start_button_state(self, active: bool) -> None:
         self.__start_button["state"] = "normal" if active else "disabled"
 
-    def __board_click(self, move: Coordinates):
-        self.__eventManager.post(EventEnum.BOARD_INPUT, move)
+    def __board_click(self, coordinates: Coordinates):
+        self.__event_manager.post(EventEnum.BOARD_INPUT, coordinates)
 
     def __show_prompt_message(self, msg: str) -> str:
         return askstring(Config.APP_NAME, prompt=msg)
@@ -76,7 +76,7 @@ class GraphicalUserInterface(DogPlayerInterface):
     def __draw_menu_panel(self) -> None:
         def on_iniciar_partida(*_):
             self.set_start_button_state(False)
-            self.__eventManager.post(EventEnum.START_MATCH)
+            self.__event_manager.post(EventEnum.START_MATCH)
 
         rightframe = Frame(self.__window)
         rightframe.grid(row=0, column=0, rowspan=10, padx=100)
@@ -224,13 +224,13 @@ class GraphicalUserInterface(DogPlayerInterface):
         def on_error(_: EventData[str]) -> None:
             self.set_start_button_state(True)
 
-        self.__eventManager.subscribe(
+        self.__event_manager.subscribe(
             EventEnum.RECEIVE_DOG_RESPONSE, display_connection_notification
         )
-        self.__eventManager.subscribe(
+        self.__event_manager.subscribe(
             EventEnum.SERVER_SIDE_ERR, display_connection_notification
         )
-        self.__eventManager.subscribe(EventEnum.SERVER_SIDE_ERR, on_error)
+        self.__event_manager.subscribe(EventEnum.SERVER_SIDE_ERR, on_error)
 
     def __resolve_tk_kwargs(self) -> dict[str, str]:
         return {"outline": ""}

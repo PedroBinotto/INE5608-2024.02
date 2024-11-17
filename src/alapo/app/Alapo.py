@@ -105,15 +105,19 @@ class Alapo:
 
     def __process_board_click(self, event: EventData[Coordinates]) -> None:
         if self.__is_player_two:
-            input = Coordinates(*self.__rotate_input((event.data.x, event.data.y)))
+            input = self.__rotate_input(event.data)
         else:
             input = event.data
 
         if self.__match_state == MatchStateEnum.WAITING_SELECT_PIECE:
             self.__local_buffer = input
             self.__match_state = MatchStateEnum.WAITING_SELECT_DEST
-            self.__highlight_destinations(event.data)
+            self.__highlight_destinations(input)
         elif self.__match_state == MatchStateEnum.WAITING_SELECT_DEST:
+            if input not in self.__board.get_available_destinations(
+                self.__local_buffer
+            ):
+                return
             self.__gui.clear_highlights()
             move = Move(self.__local_buffer, input)
             self.__register_move(move)
@@ -130,7 +134,8 @@ class Alapo:
         self.__gui.clear_highlights()
         for position in self.__board.get_available_pieces(self.__local_player.color):
             if self.__is_player_two:
-                x, y = self.__rotate_input((position.x, position.y))
+                new_coordinates = self.__rotate_input(position)
+                x, y = new_coordinates.x, new_coordinates.y
             else:
                 x, y = position.x, position.y
 
@@ -140,13 +145,17 @@ class Alapo:
         self.__gui.clear_highlights()
         for position in self.__board.get_available_destinations(origin):
             x, y = position.x, position.y
+            if self.__is_player_two:
+                new_coords = self.__rotate_input(Coordinates(x, y))
+                x, y = new_coords.x, new_coords.y
             self.__gui.draw_board_highlight(x, y)
 
     def __highlight_pieces(self):
         self.__gui.clear_highlights()
         for position in self.__board.get_available_pieces(self.__local_player.color):
             if self.__is_player_two:
-                x, y = self.__rotate_input((position.x, position.y))
+                new_coordinates = self.__rotate_input(position)
+                x, y = new_coordinates.x, new_coordinates.y
             else:
                 x, y = position.x, position.y
 
@@ -159,18 +168,19 @@ class Alapo:
     def __receive_withdrawal(self, _: EventData[None]) -> None:
         self.__gui.show_popup_message(f"Oponente {self.__remote_player.name} desistiu!")
 
-    def __rotate_input(self, coordinates: tuple[int, int]) -> tuple[int, int]:
-        i, j = coordinates
+    def __rotate_input(self, coordinates: Coordinates) -> Coordinates:
+        i, j = coordinates.x, coordinates.y
         n = Config.BOARD_SIZE
 
-        return (n - 1 - i, n - 1 - j)
+        return Coordinates(n - 1 - i, n - 1 - j)
 
     def __rotate_matrix(self, matrix):
         n = Config.BOARD_SIZE
         rotated_matrix = [[None] * n for _ in range(n)]
         for i in range(n):
             for j in range(n):
-                new_i, new_j = self.__rotate_input((i, j))
+                new_coordinates = self.__rotate_input(Coordinates(i, j))
+                new_i, new_j = new_coordinates.x, new_coordinates.y
                 rotated_matrix[new_i][new_j] = matrix[i][j]
         return rotated_matrix
 

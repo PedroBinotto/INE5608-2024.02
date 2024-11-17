@@ -77,8 +77,9 @@ class Board:
         print("__apply_move", move)
         origin, destination = move.origin, move.destination
         i, j, k, l = origin.x, origin.y, destination.x, destination.y
-        self.__matrix[k][l] = self.__matrix[i][j]
+        tmp = self.__matrix[i][j]
         self.__matrix[i][j] = None
+        self.__matrix[k][l] = tmp
 
     def get_available_pieces(self, color: PieceColorEnum) -> list[Coordinates]:
         line_n = 0 if color == PieceColorEnum.BLACK else Config.BOARD_SIZE - 1
@@ -102,6 +103,7 @@ class Board:
         if len(checks) > 1:
             return []
         elif len(checks) == 1:
+            target = checks[0]
 
             def ort_filter(coord: Coordinates) -> bool:
                 candidates_one = [
@@ -111,7 +113,7 @@ class Board:
                 candidates_n = [PieceTypeEnum.SQUARE_LARGE, PieceTypeEnum.CIRCLE_LARGE]
                 pass
 
-            def diag_filter_filter(coord: Coordinates) -> bool:
+            def diag_filter(coord: Coordinates) -> bool:
                 candidates_one = [
                     PieceTypeEnum.TRIANGLE_SMALL_SMALL,
                     PieceTypeEnum.CIRCLE_SMALL,
@@ -121,10 +123,10 @@ class Board:
                     PieceTypeEnum.CIRCLE_LARGE,
                 ]
 
-            target = checks[0]
             possible_captures = []
 
             orthogonals = filter(ort_filter, self.__trace_orthogonal(target))
+            diagonals = filter(diag_filter, self.__trace_diagonal(target))
         else:
             return pieces
 
@@ -180,7 +182,7 @@ class Board:
             while limits[idx](i, j):
                 coord = Coordinates(i, j)
                 print(coord)
-                if self.read(coord) is not None:
+                if self.read(coord) is not None:  # TODO: tratar capturas
                     break
                 diagonals.append(coord)
                 if one_step:
