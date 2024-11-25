@@ -158,75 +158,111 @@ class Board:
     def __trace_diagonal(
         self, origin: Coordinates, one_step: bool = False
     ) -> list[Coordinates]:
-        diagonals: list[Coordinates] = []
-
         x, y = origin.x, origin.y
+        rows = Config.BOARD_SIZE
+        cols = Config.BOARD_SIZE
+        diagonals = []
 
-        transformers: list[tuple[Callable[[int], int], Callable[[int], int]]] = [
-            (lambda x: x - 1, lambda y: y - y),
-            (lambda x: x - 1, lambda y: y + y),
-            (lambda x: x + 1, lambda y: y - y),
-            (lambda x: x + 1, lambda y: y + y),
-        ]
+        # Top-left diagonal
+        i, j = x - 1, y - 1
+        while i >= 0 and j >= 0:
+            c = Coordinates(i, j)
+            if self.read(c) is not None:
+                break
+            diagonals.append(c)
+            if one_step:
+                break
+            i -= 1
+            j -= 1
 
-        limits: tuple[Callable[[int, int], bool]] = (
-            lambda c, d: c >= 0 and d >= 0,
-            lambda c, d: c >= 0 and d < Config.BOARD_SIZE,
-            lambda c, d: c < Config.BOARD_SIZE and d >= 0,
-            lambda c, d: c < Config.BOARD_SIZE and d < Config.BOARD_SIZE,
-        )
+        # Top-right diagonal
+        i, j = x - 1, y + 1
+        while i >= 0 and j < cols:
+            c = Coordinates(i, j)
+            if self.read(c) is not None:
+                break
+            diagonals.append(c)
+            if one_step:
+                break
+            i -= 1
+            j += 1
 
-        for idx, (tx, ty) in enumerate(transformers):
-            i, j = tx(x), ty(y)
+        # Bottom-left diagonal
+        i, j = x + 1, y - 1
+        while i < rows and j >= 0:
+            c = Coordinates(i, j)
+            if self.read(c) is not None:
+                break
+            diagonals.append(c)
+            if one_step:
+                break
+            i += 1
+            j -= 1
 
-            while limits[idx](i, j):
-                coord = Coordinates(i, j)
-                print(coord)
-                if self.read(coord) is not None:  # TODO: tratar capturas
-                    break
-                diagonals.append(coord)
-                if one_step:
-                    break
-                i = tx(i)
-                j = ty(j)
+        # Bottom-right diagonal
+        i, j = x + 1, y + 1
+        while i < rows and j < cols:
+            c = Coordinates(i, j)
+            if self.read(c) is not None:
+                break
+            diagonals.append(c)
+            if one_step:
+                break
+            i += 1
+            j += 1
 
-        print("diagonals", diagonals)
         return diagonals
 
     def __trace_orthogonal(
         self, origin: Coordinates, one_step: bool = False
     ) -> list[Coordinates]:
-        orthogonals: List[Coordinates] = []
         x, y = origin.x, origin.y
+        rows = Config.BOARD_SIZE
+        cols = Config.BOARD_SIZE
+        orthogonals = []
 
-        transformers: list[tuple[Callable[[int], int], Callable[[int], int]]] = [
-            (lambda x: x - 1, lambda y: y),
-            (lambda x: x + 1, lambda y: y),
-            (lambda x: x, lambda y: y - 1),
-            (lambda x: x, lambda y: y + 1),
-        ]
+        # Up
+        i = x - 1
+        while i >= 0:
+            c = Coordinates(i, y)
+            if self.read(c) is not None:
+                break
+            orthogonals.append(c)
+            if one_step:
+                break
+            i -= 1
 
-        limits: list[Callable[[int, int], bool]] = [
-            lambda c: c >= 0,
-            lambda c: c < Config.BOARD_SIZE,
-        ]
+        # Down
+        i = x + 1
+        while i < rows:
+            c = Coordinates(i, y)
+            if self.read(c) is not None:
+                break
+            orthogonals.append(c)
+            if one_step:
+                break
+            i += 1
 
-        for idx, (tx, ty) in enumerate(transformers):
-            i, j = tx(x), ty(y)
+        # Left
+        j = y - 1
+        while j >= 0:
+            c = Coordinates(x, j)
+            if self.read(c) is not None:
+                break
+            orthogonals.append(c)
+            if one_step:
+                break
+            j -= 1
 
-            l_idx = idx % 2
-            k = (i, j)[int(2 <= idx < 4)]
+        # Right
+        j = y + 1
+        while j < cols:
+            c = Coordinates(x, j)
+            if self.read(c) is not None:
+                break
+            orthogonals.append(c)
+            if one_step:
+                break
+            j += 1
 
-            while limits[l_idx](k):
-                coord = Coordinates(i, j)
-                print(coord)
-                if self.read(coord) is not None:
-                    break
-                orthogonals.append(coord)
-                if one_step:
-                    break
-                i = tx(i)
-                j = ty(j)
-
-        print("orthogonals", orthogonals)
         return orthogonals

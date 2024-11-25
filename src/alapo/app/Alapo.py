@@ -133,12 +133,11 @@ class Alapo:
     def __highlight_pieces(self):
         self.__gui.clear_highlights()
         for position in self.__board.get_available_pieces(self.__local_player.color):
-            if self.__is_player_two:
-                new_coordinates = self.__rotate_input(position)
-                x, y = new_coordinates.x, new_coordinates.y
-            else:
-                x, y = position.x, position.y
-
+            #           if self.__is_player_two:
+            #               new_coordinates = self.__rotate_input(position)
+            #               x, y = new_coordinates.x, new_coordinates.y
+            #           else:
+            x, y = position.x, position.y
             self.__gui.draw_board_highlight(x, y)
 
     def __highlight_destinations(self, origin: Coordinates):
