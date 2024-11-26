@@ -1,6 +1,5 @@
-from collections.abc import Callable
 from dataclasses import dataclass
-from typing import List
+from typing import Callable, List
 from alapo.app.Piece import PieceColorEnum, Piece, PieceTypeEnum
 from alapo.app.config import Config
 
@@ -158,111 +157,61 @@ class Board:
     def __trace_diagonal(
         self, origin: Coordinates, one_step: bool = False
     ) -> list[Coordinates]:
-        x, y = origin.x, origin.y
-        rows = Config.BOARD_SIZE
-        cols = Config.BOARD_SIZE
         diagonals = []
+        x, y = origin.x, origin.y
+        transformers: list[Callable[[int, int], tuple[int]]] = [
+            lambda x, y: (x - 1, y - 1),
+            lambda x, y: (x - 1, y + 1),
+            lambda x, y: (x + 1, y - 1),
+            lambda x, y: (x + 1, y + 1),
+        ]
+        limiters: list[Callable[[int, int, int], bool]] = [
+            lambda i, j, _: i >= 0 and j >= 0,
+            lambda i, j, c: i >= 0 and j < c,
+            lambda i, j, c: i < c and j >= 0,
+            lambda i, j, c: i < c and j < c,
+        ]
 
-        # Top-left diagonal
-        i, j = x - 1, y - 1
-        while i >= 0 and j >= 0:
-            c = Coordinates(i, j)
-            if self.read(c) is not None:
-                break
-            diagonals.append(c)
-            if one_step:
-                break
-            i -= 1
-            j -= 1
-
-        # Top-right diagonal
-        i, j = x - 1, y + 1
-        while i >= 0 and j < cols:
-            c = Coordinates(i, j)
-            if self.read(c) is not None:
-                break
-            diagonals.append(c)
-            if one_step:
-                break
-            i -= 1
-            j += 1
-
-        # Bottom-left diagonal
-        i, j = x + 1, y - 1
-        while i < rows and j >= 0:
-            c = Coordinates(i, j)
-            if self.read(c) is not None:
-                break
-            diagonals.append(c)
-            if one_step:
-                break
-            i += 1
-            j -= 1
-
-        # Bottom-right diagonal
-        i, j = x + 1, y + 1
-        while i < rows and j < cols:
-            c = Coordinates(i, j)
-            if self.read(c) is not None:
-                break
-            diagonals.append(c)
-            if one_step:
-                break
-            i += 1
-            j += 1
+        for idx, t in enumerate(transformers):
+            i, j = t(x, y)
+            lmt = limiters[idx]
+            while lmt(i, j, Config.BOARD_SIZE):
+                c = Coordinates(i, j)
+                if self.read(c) is not None:
+                    break
+                diagonals.append(c)
+                if one_step:
+                    break
+                i, j = t(i, j)
 
         return diagonals
 
     def __trace_orthogonal(
         self, origin: Coordinates, one_step: bool = False
     ) -> list[Coordinates]:
-        x, y = origin.x, origin.y
-        rows = Config.BOARD_SIZE
-        cols = Config.BOARD_SIZE
         orthogonals = []
-
-        # Up
-        i = x - 1
-        while i >= 0:
-            c = Coordinates(i, y)
-            if self.read(c) is not None:
-                break
-            orthogonals.append(c)
-            if one_step:
-                break
-            i -= 1
-
-        # Down
-        i = x + 1
-        while i < rows:
-            c = Coordinates(i, y)
-            if self.read(c) is not None:
-                break
-            orthogonals.append(c)
-            if one_step:
-                break
-            i += 1
-
-        # Left
-        j = y - 1
-        while j >= 0:
-            c = Coordinates(x, j)
-            if self.read(c) is not None:
-                break
-            orthogonals.append(c)
-            if one_step:
-                break
-            j -= 1
-
-        # Right
-        j = y + 1
-        while j < cols:
-            c = Coordinates(x, j)
-            if self.read(c) is not None:
-                break
-            orthogonals.append(c)
-            if one_step:
-                break
-            j += 1
-
+        x, y = origin.x, origin.y
+        transformers = [
+            lambda x, y: (x - 1, y),
+            lambda x, y: (x + 1, y),
+            lambda x, y: (x, y - 1),
+            lambda x, y: (x, y + 1),
+        ]
+        limiters = [
+            lambda i, _, __: i >= 0,
+            lambda i, _, c: i < c,
+            lambda _, j, __: j >= 0,
+            lambda _, j, c: j < c,
+        ]
+        for idx, t in enumerate(transformers):
+            i, j = t(x, y)
+            lmt = limiters[idx]
+            while lmt(i, j, Config.BOARD_SIZE):
+                c = Coordinates(i, j)
+                if self.read(c) is not None:
+                    break
+                orthogonals.append(c)
+                if one_step:
+                    break
+                i, j = t(i, j)
         return orthogonals
