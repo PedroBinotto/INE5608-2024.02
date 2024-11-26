@@ -97,7 +97,9 @@ class Alapo:
         self.__refresh()
 
         if not self.__is_player_two:
-            self.__highlight_pieces()
+            self.__highlight_pieces(
+                self.__board.get_available_pieces(self.__local_player.color)
+            )
 
         self.__gui.show_popup_message(
             f"Partida iniciada contra {self.__remote_player.name}!"
@@ -132,8 +134,15 @@ class Alapo:
 
     def __receive_move(self, event: EventData[Move]):
         self.__register_move(event.data)
+        positions = self.__board.get_available_pieces(self.__local_player.color)
+
+        if not len(positions):
+            self.__match_state = MatchStateEnum.FINISHED_BY_VICTORY
+            self.__communicate_loss()
+            return
+
         self.__match_state = MatchStateEnum.WAITING_SELECT_PIECE
-        self.__highlight_pieces()
+        self.__highlight_pieces(positions)
 
     def __highlight_destinations(self, origin: Coordinates):
         self.__gui.clear_highlights()
@@ -146,9 +155,9 @@ class Alapo:
                 x, y = new_coords.x, new_coords.y
             self.__gui.draw_board_highlight(x, y)
 
-    def __highlight_pieces(self):
+    def __highlight_pieces(self, positions):
         self.__gui.clear_highlights()
-        for position in self.__board.get_available_pieces(self.__local_player.color):
+        for position in positions:
             if self.__is_player_two:
                 new_coordinates = self.__rotate_input(position)
                 x, y = new_coordinates.x, new_coordinates.y
@@ -160,6 +169,15 @@ class Alapo:
     def __register_move(self, move: Move) -> None:
         self.__board.apply_move(move)
         self.__refresh()
+
+    def __communicate_loss(self):
+        self.__gui.show_popup_message(f"Oponente {self.__remote_player.name} venceu!")
+        self.__gui.on_match_finish()
+        self.__dog_actor.send_move(
+            {
+                "match_status": "finished",
+            }
+        )
 
     def __receive_withdrawal(self, _: EventData[None]) -> None:
         self.__gui.show_popup_message(f"Oponente {self.__remote_player.name} desistiu!")
@@ -187,9 +205,9 @@ class Alapo:
             else self.__rotate_matrix(self.__board.matrix)
         )
 
-    def __serialize_move(self, move: Move, status: str = "next") -> dict:
+    def __serialize_move(self, move: Move) -> dict:
         return {
-            "match_status": status,
+            "match_status": "next",
             "origin": {"x": move.origin.x, "y": move.origin.y},
             "destination": {
                 "x": move.destination.x,

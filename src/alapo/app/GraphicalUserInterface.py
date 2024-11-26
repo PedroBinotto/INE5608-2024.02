@@ -40,13 +40,15 @@ class GraphicalUserInterface(DogPlayerInterface):
         self.__event_manager.post(EventEnum.RECEIVE_START_MATCH, start_status)
 
     def receive_move(self, a_move) -> None:
-        self.show_popup_message("Recebe movimento")
-        self.__event_manager.post(
-            EventEnum.RECEIVE_MOVE, self.__deserialize_move(a_move)
-        )
+        move = self.__deserialize_move(a_move)
+        if move:
+            self.show_popup_message("Recebe movimento")
+            self.__event_manager.post(EventEnum.RECEIVE_MOVE, move)
+            return
+        self.__finish_by_victory()
 
     def receive_withdrawal_notification(self) -> None:
-        self.set_start_button_state(True)
+        self.on_match_finish()
         self.__event_manager.post(EventEnum.RECEIVE_WITHDRAWAL)
 
     def update_board_display(self, board_state: List[List[Piece | None]]) -> None:
@@ -62,6 +64,14 @@ class GraphicalUserInterface(DogPlayerInterface):
 
     def set_start_button_state(self, active: bool) -> None:
         self.__start_button["state"] = "normal" if active else "disabled"
+
+    def __finish_by_victory(self):
+        self.show_popup_message("Você venceu!")
+        self.on_match_finish()
+
+    def on_match_finish(self) -> None:
+        self.set_start_button_state(True)
+        self.clear_highlights()
 
     def __board_click(self, coordinates: Coordinates):
         self.__event_manager.post(EventEnum.BOARD_INPUT, coordinates)
@@ -236,7 +246,9 @@ class GraphicalUserInterface(DogPlayerInterface):
         return {"outline": ""}
 
     def __deserialize_move(self, move: dict) -> Move:
-        return Move(
-            Coordinates(move["origin"]["x"], move["origin"]["y"]),
-            Coordinates(move["destination"]["x"], move["destination"]["y"]),
-        )
+        if move["match_status"] == "next":
+            return Move(
+                Coordinates(move["origin"]["x"], move["origin"]["y"]),
+                Coordinates(move["destination"]["x"], move["destination"]["y"]),
+            )
+        return None
