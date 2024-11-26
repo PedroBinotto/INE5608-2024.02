@@ -131,16 +131,9 @@ class Alapo:
             self.__match_state = MatchStateEnum.WAITING_REMOTE
 
     def __receive_move(self, event: EventData[Move]):
-        print("__receive_move", event.data)
         self.__register_move(event.data)
         self.__match_state = MatchStateEnum.WAITING_SELECT_PIECE
         self.__highlight_pieces()
-
-    def __highlight_pieces(self):
-        self.__gui.clear_highlights()
-        for position in self.__board.get_available_pieces(self.__local_player.color):
-            x, y = position.x, position.y
-            self.__gui.draw_board_highlight(x, y)
 
     def __highlight_destinations(self, origin: Coordinates):
         self.__gui.clear_highlights()
