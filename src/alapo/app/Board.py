@@ -129,23 +129,29 @@ class Board:
         else:
             return pieces
 
-    def get_available_destinations(self, origin: Coordinates) -> list[Coordinates]:
+    def get_available_destinations(
+        self, origin: Coordinates, local_player_color: PieceColorEnum
+    ) -> list[Coordinates]:
         type = self.read(origin).type
         match type:
             case PieceTypeEnum.TRIANGLE_LARGE:
-                return self.__trace_diagonal(origin)
+                return self.__trace_diagonal(origin, local_player_color)
             case PieceTypeEnum.TRIANGLE_SMALL:
-                return self.__trace_diagonal(origin, one_step=True)
+                return self.__trace_diagonal(origin, local_player_color, one_step=True)
             case PieceTypeEnum.SQUARE_LARGE:
-                return self.__trace_orthogonal(origin)
+                return self.__trace_orthogonal(origin, local_player_color)
             case PieceTypeEnum.SQUARE_SMALL:
-                return self.__trace_orthogonal(origin, one_step=True)
+                return self.__trace_orthogonal(
+                    origin, local_player_color, one_step=True
+                )
             case PieceTypeEnum.CIRCLE_LARGE:
-                return self.__trace_diagonal(origin) + self.__trace_orthogonal(origin)
+                return self.__trace_diagonal(
+                    origin, local_player_color
+                ) + self.__trace_orthogonal(origin, local_player_color)
             case PieceTypeEnum.CIRCLE_SMALL:
                 return self.__trace_diagonal(
-                    origin, one_step=True
-                ) + self.__trace_orthogonal(origin, one_step=True)
+                    origin, local_player_color, one_step=True
+                ) + self.__trace_orthogonal(origin, local_player_color, one_step=True)
 
     @property
     def matrix(self) -> List[List[Piece | None]]:
@@ -155,7 +161,10 @@ class Board:
         return self.__matrix[coordinates.x][coordinates.y]
 
     def __trace_diagonal(
-        self, origin: Coordinates, one_step: bool = False
+        self,
+        origin: Coordinates,
+        local_player_color: PieceColorEnum,
+        one_step: bool = False,
     ) -> list[Coordinates]:
         diagonals = []
         x, y = origin.x, origin.y
@@ -177,7 +186,10 @@ class Board:
             lmt = limiters[idx]
             while lmt(i, j, Config.BOARD_SIZE):
                 c = Coordinates(i, j)
-                if self.read(c) is not None:
+                piece = self.read(c)
+                if piece is not None:
+                    if piece.color != local_player_color:
+                        diagonals.append(c)
                     break
                 diagonals.append(c)
                 if one_step:
@@ -187,7 +199,10 @@ class Board:
         return diagonals
 
     def __trace_orthogonal(
-        self, origin: Coordinates, one_step: bool = False
+        self,
+        origin: Coordinates,
+        local_player_color: PieceColorEnum,
+        one_step: bool = False,
     ) -> list[Coordinates]:
         orthogonals = []
         x, y = origin.x, origin.y
@@ -208,7 +223,10 @@ class Board:
             lmt = limiters[idx]
             while lmt(i, j, Config.BOARD_SIZE):
                 c = Coordinates(i, j)
-                if self.read(c) is not None:
+                piece = self.read(c)
+                if piece is not None:
+                    if piece.color != local_player_color:
+                        orthogonals.append(c)
                     break
                 orthogonals.append(c)
                 if one_step:

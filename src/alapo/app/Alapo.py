@@ -110,14 +110,20 @@ class Alapo:
             input = event.data
 
         if self.__match_state == MatchStateEnum.WAITING_SELECT_PIECE:
+            if input not in self.__board.get_available_pieces(
+                self.__local_player.color
+            ):
+                return
+
             self.__local_buffer = input
             self.__match_state = MatchStateEnum.WAITING_SELECT_DEST
             self.__highlight_destinations(input)
         elif self.__match_state == MatchStateEnum.WAITING_SELECT_DEST:
             if input not in self.__board.get_available_destinations(
-                self.__local_buffer
+                self.__local_buffer, self.__local_player.color
             ):
                 return
+
             self.__gui.clear_highlights()
             move = Move(self.__local_buffer, input)
             self.__register_move(move)
@@ -138,7 +144,9 @@ class Alapo:
 
     def __highlight_destinations(self, origin: Coordinates):
         self.__gui.clear_highlights()
-        for position in self.__board.get_available_destinations(origin):
+        for position in self.__board.get_available_destinations(
+            origin, self.__local_player.color
+        ):
             x, y = position.x, position.y
             if self.__is_player_two:
                 new_coords = self.__rotate_input(Coordinates(x, y))
