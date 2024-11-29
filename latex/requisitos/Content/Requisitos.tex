@@ -3,9 +3,10 @@
 \section{Requisitos Funcionais}
 
 \subsection{RF1: Iniciar programa}\label{subsection:RF1}
-Ao iniciar, o programa deve mostrar a interface do \hyperref[fig:configuracao tabuleiro]{tabuleiro em sua configuração
-inicial}, e solicitar que o usuário informe o seu nome, que será usado para identificar o jogador. Após o usuário 
-informar seu nome e solicitar \rfreference{RF2}{Iniciar jogo}, o programa deverá requisitar uma conexão com o servidor;
+Ao iniciar, o programa deve mostrar uma janela de \textit{pop-up} com um único campo, solicitando que o jogador informe
+o seu nome. Após o recebimento desta informação, fechar o \textit{pop-up} e mostrar a janela principal do jogo.
+A interface deverá mostrar o \hyperref[fig:configuracao tabuleiro]{tabuleiro em sua configuração inicial} e um botão que
+de ``Iniciar Jogo''. Ao solicitar \rfreference{RF2}{Iniciar jogo}, o programa deverá requisitar uma conexão com o servidor;
 \begin{itemize}
   \item Caso a conexão seja bem sucedida, apresentar uma mensagem de sucesso ao usuário e liberar demais funcionalidades do jogo;
   \item Caso contrário, informar o erro ao usuário e apresentar as opções:
