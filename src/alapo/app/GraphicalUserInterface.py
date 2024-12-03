@@ -1,6 +1,5 @@
-from typing import List
 from alapo.app.Board import Coordinates, Matrix, Move
-from alapo.app.Piece import PieceColorEnum, Piece, PieceTypeEnum
+from alapo.app.Piece import PieceColorEnum, PieceTypeEnum
 from alapo.app.config import Config
 from alapo.app.meta.EventManager import EventData, EventManager, EventEnum
 from tkinter import Button, Tk, Canvas, Frame, Label

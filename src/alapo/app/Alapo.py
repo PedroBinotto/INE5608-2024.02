@@ -87,12 +87,14 @@ class Alapo:
         if self.__is_player_two:
             self.__match_state = MatchStateEnum.WAITING_REMOTE
             color = PieceColorEnum.WHITE
+            opp_color = PieceColorEnum.BLACK
         else:
             self.__match_state = MatchStateEnum.WAITING_SELECT_PIECE
             color = PieceColorEnum.BLACK
+            opp_color = PieceColorEnum.WHITE
 
         self.__local_player = Player(local_player[1], local_player[0], color)
-        self.__remote_player = Player(remote_player[1], remote_player[0], color)
+        self.__remote_player = Player(remote_player[1], remote_player[0], opp_color)
 
         self.__board.setup()
         self.__refresh()
