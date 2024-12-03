@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable, List
+from typing import Callable
 from alapo.app.Piece import PieceColorEnum, Piece, PieceTypeEnum
 from alapo.app.config import Config
 
@@ -16,9 +16,12 @@ class Move:
     destination: Coordinates
 
 
+type Matrix = list[list[Coordinates | None]]
+
+
 class Board:
     def __init__(self) -> None:
-        self.__matrix: List[List[Piece | None]] = [
+        self.__matrix: Matrix = [
             [None for _ in range(Config.BOARD_SIZE)] for _ in range(Config.BOARD_SIZE)
         ]
 
@@ -136,7 +139,7 @@ class Board:
                 ) + self.__trace_orthogonal(origin, local_player_color, one_step=True)
 
     @property
-    def matrix(self) -> List[List[Piece | None]]:
+    def matrix(self) -> Matrix:
         return self.__matrix
 
     def read(self, coordinates: Coordinates) -> Piece | None:

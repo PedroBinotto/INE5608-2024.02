@@ -1,5 +1,5 @@
 from typing import List
-from alapo.app.Board import Coordinates, Move
+from alapo.app.Board import Coordinates, Matrix, Move
 from alapo.app.Piece import PieceColorEnum, Piece, PieceTypeEnum
 from alapo.app.config import Config
 from alapo.app.meta.EventManager import EventData, EventManager, EventEnum
@@ -24,7 +24,7 @@ class GraphicalUserInterface(DogPlayerInterface):
         self.__event_manager = EventManager()
         self.__window: Tk = None
         self.__canvas: Canvas = None
-        self.__setupSubscriptions()
+        self.__setup_subscriptions()
 
     def initialize(self) -> None:
         self.__window = Tk()
@@ -51,7 +51,7 @@ class GraphicalUserInterface(DogPlayerInterface):
         self.on_match_finish()
         self.__event_manager.post(EventEnum.RECEIVE_WITHDRAWAL)
 
-    def update_board_display(self, board_state: List[List[Piece | None]]) -> None:
+    def update_board_display(self, board_state: Matrix) -> None:
         self.__canvas.delete("piece")
         for i in range(Config.BOARD_SIZE):
             for j in range(Config.BOARD_SIZE):
@@ -65,7 +65,7 @@ class GraphicalUserInterface(DogPlayerInterface):
     def set_start_button_state(self, active: bool) -> None:
         self.__start_button["state"] = "normal" if active else "disabled"
 
-    def __finish_by_victory(self):
+    def __finish_by_victory(self) -> None:
         self.show_popup_message("Você venceu!")
         self.on_match_finish()
 
@@ -73,7 +73,7 @@ class GraphicalUserInterface(DogPlayerInterface):
         self.set_start_button_state(True)
         self.clear_highlights()
 
-    def __board_click(self, coordinates: Coordinates):
+    def __board_click(self, coordinates: Coordinates) -> None:
         self.__event_manager.post(EventEnum.BOARD_INPUT, coordinates)
 
     def __show_prompt_message(self, msg: str) -> str:
@@ -120,7 +120,7 @@ class GraphicalUserInterface(DogPlayerInterface):
         self.__canvas.create_rectangle(*args, **kwargs)
         self.__bind_button_tag(i, j, tag_prefix)
 
-    def clear_highlights(self):
+    def clear_highlights(self) -> None:
         self.__canvas.delete("highlight")
 
     def draw_board_highlight(self, i: int, j: int) -> None:
@@ -200,7 +200,7 @@ class GraphicalUserInterface(DogPlayerInterface):
                 )
         self.__bind_button_tag(i, j, tag_prefix)
 
-    def __bind_button_tag(self, i: int, j: int, tag_prexfix: str):
+    def __bind_button_tag(self, i: int, j: int, tag_prexfix: str) -> None:
         self.__canvas.tag_bind(
             f"{tag_prexfix}{i}{j}",
             "<Button-1>",
@@ -227,7 +227,7 @@ class GraphicalUserInterface(DogPlayerInterface):
             - padding,
         )
 
-    def __setupSubscriptions(self) -> None:
+    def __setup_subscriptions(self) -> None:
         def display_connection_notification(event: EventData[str]) -> None:
             self.show_popup_message(event.data)
 

@@ -34,16 +34,16 @@ class EventManager(metaclass=Singleton):
     def __init__(self):
         self.__subscribers: Dict[EventEnum, Set[EventHandlerCallback]] = dict()
 
-    def subscribe(self, event: EventEnum, callback: EventHandlerCallback):
+    def subscribe(self, event: EventEnum, callback: EventHandlerCallback) -> None:
         if event not in self.__subscribers.keys():
             self.__subscribers[event] = set()
             self.__subscribers[event].add(EventManager.Logger.log)
         self.__subscribers[event].add(callback)
 
-    def unsubscribe(self, event: EventEnum, callback: EventHandlerCallback):
+    def unsubscribe(self, event: EventEnum, callback: EventHandlerCallback) -> None:
         self.__subscribers[event].remove(callback)
 
-    def post(self, event: EventEnum, data: Optional[Any] = None):
+    def post(self, event: EventEnum, data: Optional[Any] = None) -> None:
         if event not in self.__subscribers.keys():
             self.__subscribers[event] = set()
             self.__subscribers[event].add(EventManager.Logger.log)
