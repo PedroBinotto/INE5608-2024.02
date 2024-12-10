@@ -183,6 +183,7 @@ class Alapo:
         )
 
     def __receive_withdrawal(self, _: EventData[None]) -> None:
+        self.__match_state = MatchStateEnum.NONE
         self.__gui.show_popup_message(f"Oponente {self.__remote_player.name} desistiu!")
 
     def __rotate_input(self, coordinates: Coordinates) -> Coordinates:
