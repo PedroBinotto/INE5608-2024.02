@@ -15,6 +15,9 @@ urllib3 = "1.26.9"
 autopep8 = "^2.3.1"
 pylint = "^3.3.1"
 
+[tool.poetry.scripts]
+alapo = "alapo.__main__:main"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,59 @@
+<h1 id="ine5608---alapo---entrega-4">INE5608 - Alapo - Entrega 4</h1>
+<ul>
+<li><a
+href="https://drive.google.com/drive/folders/1mm3XLVuhgV4KnJxWXXap6aT_GoVg9fgm?usp=drive_link">Vídeos
+de apresentação - Pedro e Gabriel</a></li>
+</ul>
+<p>O projeto está organizado da seguinte maneira:</p>
+<pre><code>.
+├── ALAPO - Especificação de Requisitos.pdf
+├── REAMDE.md
+├── latex
+│   └── // CÓDIGO FONTE DO DOC. DE ESPECIFICAÇÃO DE REQUISITOS
+├── src
+│   └── // CÓDIGO FONTE DO PROJETO
+└── visualparadigm
+    └── // ARQUIVO DE PROJETO - VISUAL PARADIGM</code></pre>
+<h2 id="executando-o-projeto">Executando o projeto</h2>
+<p>O gerenciamento de dependências do projeto é feita através do <a
+href="https://python-poetry.org/">Poetry</a>; recomendamos que utilize
+esta ferramenta para realizar a instalação das bibliotecas utilizadas
+com facilidade. Caso deseje, as instruções para instalação e execução do
+projeto utilizando somente <code>pip</code> e <code>venv</code> estão
+disponíveis na próxima seção.</p>
+<ol type="1">
+<li>Instale o Poetry para realizar a instalação das dependências
+(recomendado instalar usando o <a
+href="https://pipx.pypa.io/stable/installation/">pipx</a>, para não
+interferir com os ambientes virtuais do seu sistema operacional):</li>
+</ol>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pipx</span> install poetry</span></code></pre></div>
+<ol start="2" type="1">
+<li>Instale as dependências do projeto:</li>
+</ol>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pwd: INE5608-2024.02-4.0.0-entrega/src</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">poetry</span> install</span></code></pre></div>
+<ol start="3" type="1">
+<li>Execute o projeto:</li>
+</ol>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pwd: INE5608-2024.02-4.0.0-entrega/src</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">poetry</span> run alapo</span></code></pre></div>
+<p>Alternativamente, a instalação e execução pode ser feita diretamente
+via <code>pip</code>:</p>
+<ol type="1">
+<li>Instancie e ative um ambiente virtual para a instalação do
+projeto:</li>
+</ol>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pwd: INE5608-2024.02-4.0.0-entrega/src</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> venv .venv</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span></code></pre></div>
+<ol start="2" type="1">
+<li>Instale as dependências do projeto:</li>
+</ol>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pwd: INE5608-2024.02-4.0.0-entrega/src</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-r</span> requirements.txt</span></code></pre></div>
+<ol start="3" type="1">
+<li>Execute o projeto:</li>
+</ol>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pwd: INE5608-2024.02-4.0.0-entrega/src</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> alapo</span></code></pre></div>
